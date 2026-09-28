@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local Echo diagnostics
+.deverr.txt
+.devlog.txt
+.hs-verify.mjs
+.shots/

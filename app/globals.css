@@ -1,26 +1,263 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===========================================================================
+   Echo — "Archive"
+   ---------------------------------------------------------------------------
+   Echo is an investigation desk, not a chat app. The visual language borrows
+   from case files and audit ledgers rather than from AI product marketing:
+   warm paper, hairline rules, monospaced figures, and one restrained accent.
+
+   The accent is a deep petrol teal. Teal reads institutional and calm, and it
+   keeps the product clearly out of the indigo/purple "AI dashboard" register.
+   Brass is reserved for exactly one meaning: the gap between what the policy
+   says and what the company actually did. It is never decorative.
+   =========================================================================== */
+
+@theme {
+  /* surfaces — warm, not clinical */
+  --color-base: #f4f2ee;
+  --color-surface: #fbfaf8;
+  --color-sunken: #edeae4;
+  --color-rail: #f1efea;
+  --color-line: #e3dfd7;
+  --color-line2: #d1ccc1;
+
+  /* petrol — the identity */
+  --color-teal: #0c615c;
+  --color-teal-deep: #084a46;
+  --color-teal-soft: #b9d8d3;
+  --color-teal-wash: #edf4f2;
+
+  /* brass — the policy/practice gap. One meaning only. */
+  --color-brass: #8a6420;
+  --color-brass-soft: #e3d4ae;
+  --color-brass-wash: #faf5e8;
+
+  /* ink */
+  --color-ink: #17181a;
+  --color-ink2: #4b4e53;
+  --color-ink3: #767a80;
+  --color-ink4: #9ba0a6;
+
+  /* semantic, desaturated so they sit inside the paper */
+  --color-good: #1c6b4a;
+  --color-stop: #a33a32;
+  --color-warn: #8a6420;
+
+  /* depth — the centre sheet lifts off the rails */
+  --shadow-soft: 0 1px 2px rgba(23, 24, 26, 0.05), 0 1px 1px rgba(23, 24, 26, 0.03);
+  --shadow-raise: 0 8px 20px -8px rgba(23, 24, 26, 0.18), 0 1px 3px rgba(23, 24, 26, 0.05);
+  --shadow-sheet: 0 1px 2px rgba(23, 24, 26, 0.04), 0 12px 32px -20px rgba(23, 24, 26, 0.16);
+  --shadow-panel: 0 24px 60px -24px rgba(23, 24, 26, 0.3), 0 2px 8px rgba(23, 24, 26, 0.06);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  height: 100%;
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  background-color: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* one consistent focus treatment for every interactive element */
+:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+
+/* quiet scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d1ccc1 transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: #dcd7cc;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #c4bfb2;
+  background-clip: content-box;
+}
+
+::selection {
+  background: rgba(12, 97, 92, 0.16);
+}
+
+/* A 1px inner highlight is what separates a warm-white sheet from warm-white
+   background. Cheaper and calmer than a heavier drop shadow. */
+.echo-sheet {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    var(--shadow-sheet);
+}
+
+/* ===========================================================================
+   Motion.
+   Every animation communicates a state change: arrival, progress, completion,
+   disclosure, feedback. Nothing decorative and nothing looping except the
+   investigation "live" dot, the skeletons, and button spinners.
+   =========================================================================== */
+
+@keyframes echo-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes echo-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes echo-slide-in {
+  from {
+    opacity: 0;
+    transform: translate3d(10px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes echo-slide-in-l {
+  from {
+    opacity: 0;
+    transform: translate3d(-10px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes echo-settle {
+  0% {
+    opacity: 0;
+    transform: scale(0.84);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes echo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes echo-live {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.35;
+  }
+}
+
+/* skeletons: a slow, low-contrast sweep. Reads as "working", never as neon. */
+@keyframes echo-sweep {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.echo-rise {
+  animation: echo-rise 260ms cubic-bezier(0.22, 0.7, 0.3, 1) both;
+}
+.echo-fade {
+  animation: echo-fade 200ms ease-out both;
+}
+.echo-slide-in {
+  animation: echo-slide-in 220ms cubic-bezier(0.22, 0.7, 0.3, 1) both;
+}
+.echo-slide-in-l {
+  animation: echo-slide-in-l 220ms cubic-bezier(0.22, 0.7, 0.3, 1) both;
+}
+.echo-settle {
+  animation: echo-settle 320ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+.echo-spin {
+  animation: echo-spin 720ms linear infinite;
+}
+.echo-live {
+  animation: echo-live 1.4s ease-in-out infinite;
+}
+.echo-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-sunken);
+}
+.echo-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.62),
+    transparent
+  );
+  animation: echo-sweep 1.5s ease-in-out infinite;
+}
+
+/* reduced motion: state changes stay, movement does not */
+@media (prefers-reduced-motion: reduce) {
+  .echo-rise,
+  .echo-fade,
+  .echo-slide-in,
+  .echo-slide-in-l,
+  .echo-settle,
+  .echo-spin,
+  .echo-live,
+  .echo-skeleton::after {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
