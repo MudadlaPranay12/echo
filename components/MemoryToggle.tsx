@@ -1,8 +1,10 @@
 "use client";
-// MemoryToggle — Echo's signature control.
-// A real switch: keyboard operable, focusable, and it never reloads the page.
-// Flipping it changes only whether organisational memory is searched; the memory
-// rail then states plainly that nothing in it may be treated as precedent.
+// MemoryToggle — Echo's mode selector.
+// Not a switch with a label beside it: a system mode. On, institutional memory
+// is searched and the answer can be compared against precedent. Off, the answer
+// rests on the written policy alone and the rail says so. The two states are
+// stated in words, the track carries a single gradient, and the knob overshoots
+// as it travels. Keyboard operable, and aria-pressed always states the truth.
 
 import { cx } from "./ui";
 
@@ -16,55 +18,28 @@ export default function MemoryToggle({
   return (
     <button
       type="button"
-      role="switch"
-      aria-checked={on}
+      aria-pressed={on}
       onClick={onToggle}
+      data-on={on ? "true" : "false"}
       aria-label={
         on
-          ? "Memory is on. Turn memory off to answer from written policy only."
-          : "Memory is off. Turn memory on to search institutional memory."
+          ? "Institutional memory is active. Switch to written policy only."
+          : "Written policy only. Switch on to search institutional memory."
       }
-      className={cx(
-        "flex items-center gap-2 rounded-[6px] border px-2 py-[5px]",
-        "transition-[background-color,border-color,transform] duration-200 ease-out active:scale-[0.97]",
-        on
-          ? "border-teal-soft bg-teal-wash hover:bg-teal-wash/70"
-          : "border-line bg-surface hover:border-ink4 hover:bg-sunken",
-      )}
+      className="echo-switch-group flex h-[44px] shrink-0 items-center gap-2.5 rounded-[12px] px-3"
     >
-      <span
-        className={cx(
-          "text-[11.5px] font-medium transition-colors duration-200",
-          on ? "text-ink" : "text-ink2",
-        )}
-      >
-        Memory
+      <span aria-hidden="true" className="echo-switch">
+        <span className="echo-switch-knob" />
       </span>
 
       <span
-        aria-hidden="true"
         className={cx(
-          "relative block h-[15px] w-[27px] rounded-full transition-colors duration-200",
-          on ? "bg-teal" : "bg-line2",
-        )}
-      >
-        <span
-          className={cx(
-            "absolute top-[2px] block h-[11px] w-[11px] rounded-full bg-white shadow-soft",
-            "transition-[left] duration-200 ease-out",
-            on ? "left-[14px]" : "left-[2px]",
-          )}
-        />
-      </span>
-
-      <span
-        aria-hidden="true"
-        className={cx(
-          "w-[18px] font-mono text-[10px] font-medium transition-colors duration-200",
+          "echo-switch-label font-mono text-[13px] font-semibold tracking-[0.14em]",
           on ? "text-teal" : "text-ink3",
         )}
       >
-        {on ? "ON" : "OFF"}
+        <span className="echo-switch-label-on">MEMORY ACTIVE</span>
+        <span className="echo-switch-label-off">POLICY ONLY</span>
       </span>
     </button>
   );

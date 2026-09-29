@@ -17,6 +17,8 @@ const eslintConfig = [
       ".next/**",
       "out/**",
       "build/**",
+      // compiled output of the deterministic test suite, not source
+      ".test-build/**",
       "next-env.d.ts",
     ],
   },

@@ -39,7 +39,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
       out.push(
         <code
           key={key}
-          className="rounded-[3px] bg-sunken px-1 py-px font-mono text-[0.92em] text-teal-deep"
+          className="rounded-[8px] border border-line bg-sunken px-1.5 py-0.5 font-mono text-[12px] text-teal"
         >
           {tok.slice(1, -1)}
         </code>,
@@ -54,7 +54,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
             href={href}
             target={href.startsWith("http") ? "_blank" : undefined}
             rel="noreferrer noopener"
-            className="text-ink underline decoration-teal-soft underline-offset-2 transition-colors hover:decoration-teal"
+            className="text-ink underline decoration-teal-soft underline-offset-2 hover:decoration-teal"
           >
             {link![1]}
           </a>
@@ -135,7 +135,7 @@ function Table({ head, rows, k }: { head: string[]; rows: string[][]; k: string 
             {head.map((h, i) => (
               <th
                 key={i}
-                className="whitespace-nowrap pb-1.5 pr-5 align-bottom text-[9px] font-semibold uppercase tracking-[0.13em] text-ink3"
+                className="whitespace-nowrap py-2 pr-4 align-bottom text-[11px] font-semibold uppercase tracking-[0.12em] text-ink3"
               >
                 {renderInline(h, `${k}-th${i}`)}
               </th>
@@ -148,7 +148,7 @@ function Table({ head, rows, k }: { head: string[]; rows: string[][]; k: string 
               {r.map((c, ci) => (
                 <td
                   key={ci}
-                  className="py-1.5 pr-5 align-top text-[12px] leading-[1.6] text-ink2"
+                  className="py-2 pr-4 align-top text-[13px] leading-[1.6] text-ink2"
                 >
                   {ci === 0 ? (
                     <span className="font-medium text-ink">
@@ -175,7 +175,7 @@ function Blocks({ lines, k }: { lines: string[]; k: string }) {
   const flushPara = () => {
     if (!para.length) return;
     nodes.push(
-      <p key={`${k}-p${nodes.length}`} className="leading-[1.65] text-ink2">
+      <p key={`${k}-p${nodes.length}`} className="text-[14px] leading-[1.6] text-ink2">
         {renderInline(para.join(" ").trim(), `${k}-p${nodes.length}`)}
       </p>,
     );
@@ -189,12 +189,12 @@ function Blocks({ lines, k }: { lines: string[]; k: string }) {
       <List
         key={`${k}-l${nodes.length}`}
         className={[
-          "space-y-1.5 pl-4",
+          "space-y-2 pl-5",
           ordered ? "list-decimal marker:text-ink3" : "list-disc marker:text-ink3",
         ].join(" ")}
       >
         {items.map((it, i) => (
-          <li key={i} className="pl-0.5 leading-[1.6] text-ink2">
+          <li key={i} className="pl-0.5 text-[14px] leading-[1.6] text-ink2">
             {renderInline(it, `${k}-l${nodes.length}-${i}`)}
           </li>
         ))}
@@ -229,7 +229,7 @@ function Blocks({ lines, k }: { lines: string[]; k: string }) {
       nodes.push(
         <p
           key={`${k}-h${nodes.length}`}
-          className="pt-1 text-[10px] font-semibold uppercase tracking-[0.13em] text-ink3"
+          className="pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink3"
         >
           {renderInline(sh[1], `${k}-h${nodes.length}`)}
         </p>,
@@ -285,12 +285,12 @@ export function EchoAnswer({ text }: { text: string }) {
           {labeled.map((s, i) => (
             <div
               key={`${s.label}${i}`}
-              className="grid grid-cols-1 gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[104px_1fr]"
+              className="grid grid-cols-1 gap-x-4 gap-y-2 py-3 sm:grid-cols-[112px_1fr]"
             >
-              <dt className="text-[9px] font-semibold uppercase leading-[1.9] tracking-[0.14em] text-ink3">
+              <dt className="text-[11px] font-semibold uppercase leading-[2.4] tracking-[0.12em] text-ink3">
                 {s.label}
               </dt>
-              <dd className="min-w-0 text-[13.5px]">
+              <dd className="min-w-0 text-[13px]">
                 <Blocks lines={s.body} k={`s${i}`} />
               </dd>
             </div>

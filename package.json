@@ -7,7 +7,16 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "seed:hindsight": "node --env-file=.env.local scripts/seed-hindsight.ts"
+    "seed:hindsight": "tsc -p scripts/tsconfig.test.json && node scripts/copy-test-assets.mjs && node --env-file=.env.local .test-build/scripts/seed-hindsight.js",
+    "build:test": "tsc -p scripts/tsconfig.test.json && node scripts/copy-test-assets.mjs",
+    "test:patterns": "npm run build:test && node .test-build/scripts/pattern-memory-tests.js",
+    "test:cases": "node scripts/case-id-tests.ts",
+    "test:recall": "npm run build:test && node --env-file=.env.local .test-build/scripts/recall-contract-tests.js",
+    "test:coldstart": "npm run build:test && node --env-file=.env.local .test-build/scripts/cold-start-tests.js",
+    "test:data": "npm run build:test && node .test-build/scripts/data-quality-tests.js",
+    "seed:expansion": "npm run build:test && node --env-file=.env.local .test-build/scripts/seed-expansion.js",
+    "test:grounding": "npm run build:test && node .test-build/scripts/grounding-tests.js",
+    "test:replay": "npm run build:test && node .test-build/scripts/replay-tests.js"
   },
   "dependencies": {
     "@vectorize-io/hindsight-client": "^0.10.1",

@@ -30,17 +30,19 @@ function Info() {
 export default function ToastHost({ items }: { items: ToastItem[] }) {
   return (
     <div
-      className="pointer-events-none fixed right-4 top-[56px] z-50 flex flex-col items-end gap-2"
+      className="pointer-events-none fixed right-6 top-16 z-50 mt-1 flex flex-col items-end gap-2"
       role="status"
       aria-live="polite"
     >
       {items.map((t) => (
         <div
           key={t.id}
-          className="echo-rise flex items-center gap-2 rounded-[7px] border border-line bg-surface px-3 py-2 shadow-panel"
+          className="flex min-h-[44px] items-center gap-2 rounded-[12px] border border-line bg-surface px-4 py-2"
         >
-          {t.tone === "ok" ? <Check /> : <Info />}
-          <span className="text-[12px] text-ink">{t.text}</span>
+          <span className={t.tone === "ok" ? "text-good" : "text-ink3"}>
+            {t.tone === "ok" ? <Check /> : <Info />}
+          </span>
+          <span className="text-[13px] text-ink2">{t.text}</span>
         </div>
       ))}
     </div>

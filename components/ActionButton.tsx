@@ -1,7 +1,10 @@
 "use client";
 // ActionButton — the one button in Echo.
-// Carries every state the brief asks for: default, hover, focus, pressed,
-// loading, success, disabled.
+//
+// Every control in the product is 44px tall, padded 16px, rounded 12px, set at
+// 14px. Nothing is oversized, including the primary: "Approve & Remember" is the
+// same size as everything else and is distinguished by colour alone, because a
+// larger button would imply a larger decision than the one being made.
 
 import type { ReactNode } from "react";
 import { cx } from "./ui";
@@ -11,7 +14,10 @@ export type ButtonState = "idle" | "loading" | "success";
 type Props = {
   children: ReactNode;
   onClick?: () => void;
-  variant?: "primary" | "secondary" | "ghost";
+  /** `primary` decides, `secondary` acts, `ghost` offers, `govern` records policy. */
+  variant?: "primary" | "secondary" | "ghost" | "govern";
+  /** Hue on hover. Shape and size never change. */
+  tone?: "amber" | "red";
   icon?: ReactNode;
   state?: ButtonState;
   successLabel?: string;
@@ -23,7 +29,7 @@ type Props = {
 
 function Spinner() {
   return (
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="echo-spin">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="echo-spin">
       <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" opacity="0.22" />
       <path
         d="M14 8A6 6 0 0 0 8 2"
@@ -37,7 +43,7 @@ function Spinner() {
 
 function Check() {
   return (
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path
         d="M3.5 8.4 6.5 11.4 12.5 4.8"
         stroke="currentColor"
@@ -49,18 +55,16 @@ function Check() {
   );
 }
 
-const VARIANT: Record<string, string> = {
-  primary:
-    "border-teal bg-teal text-white shadow-soft hover:border-teal-deep hover:bg-teal-deep hover:shadow-raise",
-  secondary:
-    "border-line2 bg-surface text-ink shadow-soft hover:border-ink4 hover:bg-sunken hover:shadow-raise",
-  ghost: "border-transparent bg-transparent text-ink2 hover:bg-sunken hover:text-ink",
+const TONE: Record<string, string> = {
+  amber: "hover:border-brass-soft hover:text-brass",
+  red: "hover:border-stop/50 hover:text-stop",
 };
 
 export default function ActionButton({
   children,
   onClick,
   variant = "secondary",
+  tone,
   icon,
   state = "idle",
   successLabel,
@@ -72,6 +76,8 @@ export default function ActionButton({
   const loading = state === "loading";
   const success = state === "success";
   const off = disabled || loading;
+  const primary = variant === "primary";
+  const bare = variant === "ghost";
 
   return (
     <button
@@ -82,13 +88,18 @@ export default function ActionButton({
       aria-label={ariaLabel}
       aria-busy={loading || undefined}
       className={cx(
-        "inline-flex h-[30px] items-center gap-1.5 rounded-[6px] border px-2.5 text-[12px] font-medium",
-        "transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out",
-        "hover:-translate-y-px active:translate-y-0 active:scale-[0.98]",
-        success
-          ? "border-good bg-good text-white shadow-soft"
-          : VARIANT[variant],
-        off && "pointer-events-none translate-y-0 opacity-45 shadow-none",
+        "echo-btn inline-flex h-[44px] shrink-0 items-center justify-center gap-2 rounded-[12px] px-4",
+        "text-[14px] font-medium",
+        bare
+          ? "text-ink3 hover:text-ink"
+          : primary
+            ? "bg-teal text-[#04140f] hover:bg-teal/90"
+            : variant === "govern"
+              ? "border border-brass-soft bg-brass-wash text-brass"
+              : "border border-line2 bg-surface-2 text-ink2",
+        !bare && !primary && !success && tone && TONE[tone],
+        success && !primary && "border border-good/50 bg-good/10 text-good",
+        off && "pointer-events-none opacity-45",
         className,
       )}
     >

@@ -1,77 +1,52 @@
 "use client";
-// PolicyVsPractice — the discovery.
-// This is the sentence the whole product exists to produce: what the document
-// says, what the company actually did, and the distance between them.
+// PolicyVsPractice — the sentence the whole product exists to produce.
 //
-// Not two cards. Two columns on a shared axis, with the divergence called out
-// underneath in the one colour reserved for exactly this meaning.
+// One comparison, mathematically balanced: a 1fr / 1px / 1fr grid, identical
+// padding on both sides, one heading size, one body size, and the rule exactly in
+// the middle. When the two disagree the rule turns brass and a single dot opens
+// in it. When there is no practice, the practice column is a compact, finished
+// statement of that fact — not an empty rectangle left behind by missing data.
 
 import type { RecallResult } from "./echoTypes";
 import { cx } from "./ui";
+import ProvenanceChip from "./ProvenanceChip";
 
-function Divergence() {
+/** Both columns use this, so neither can grow a heading of its own. */
+function ColumnHead({ title, dot, meta }: { title: string; dot: "empty" | "filled"; meta: string }) {
   return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-brass">
-      <path
-        d="M7 1.6 13 12.4H1L7 1.6Z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
+    <div className="flex items-center gap-2">
+      <span
+        aria-hidden="true"
+        className={cx(
+          "h-[6px] w-[6px] shrink-0 rounded-full",
+          dot === "filled" ? "bg-teal" : "border border-line2",
+        )}
       />
-      <path d="M7 5.8v2.9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-      <circle cx="7" cy="10.6" r="0.75" fill="currentColor" />
-    </svg>
-  );
-}
-
-function Documented({ route }: { route: string }) {
-  return (
-    <div className="min-w-0 flex-1">
-      <div className="flex items-center gap-2">
-        <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full border border-line2" />
-        <span className="text-[9.5px] font-semibold uppercase leading-none tracking-[0.15em] text-ink3">
-          Documented
-        </span>
-      </div>
-      <p className="mt-2.5 text-[13px] leading-[1.6] text-ink2">{route}</p>
+      <h3 className="text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-ink3">
+        {title}
+      </h3>
+      <span className="ml-auto font-mono text-[12px] text-ink4">{meta}</span>
     </div>
   );
 }
 
-function Observed({ recall }: { recall: RecallResult }) {
-  const st = recall.stats;
-  const has = st.similar_cases > 0;
-  const pct = has ? Math.round((st.approved / st.similar_cases) * 100) : null;
-
+function EmptyPractice() {
   return (
-    <div className="min-w-0 flex-1">
-      <div className="flex items-center gap-2">
-        <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-teal" />
-        <span className="text-[9.5px] font-semibold uppercase leading-none tracking-[0.15em] text-ink3">
-          Observed
-        </span>
-      </div>
+    <div>
+      <h4 className="text-[12px] font-semibold uppercase leading-none tracking-[0.12em] text-ink3">
+        No institutional precedent
+      </h4>
+      <p className="mt-2 text-[14px] leading-[1.6] text-ink3">
+        Written policy remains the only available guidance.
+      </p>
+    </div>
+  );
+}
 
-      {has ? (
-        <>
-          <p className="mt-2.5 text-[13px] leading-[1.6] text-ink">
-            {st.approved} of {st.similar_cases} comparable decisions were approved
-            {pct !== null && pct < 100 ? ` (${pct}%)` : ""}.
-          </p>
-          {st.top_condition && (
-            <p className="mt-2 border-l-2 border-teal-soft pl-2.5 text-[12px] leading-[1.55] text-ink2">
-              {st.top_condition.label}
-              <span className="ml-1.5 font-mono text-[10.5px] text-ink4">
-                ×{st.top_condition.count}
-              </span>
-            </p>
-          )}
-        </>
-      ) : (
-        <p className="mt-2.5 text-[13px] leading-[1.6] text-ink2">
-          No comparable decisions on record.
-        </p>
-      )}
+function GapIndicator({ gapText }: { gapText: string }) {
+  return (
+    <div className="echo-gap-indicator echo-gap-indicator--animate">
+      {gapText}
     </div>
   );
 }
@@ -80,8 +55,21 @@ export default function PolicyVsPractice({ recall }: { recall?: RecallResult }) 
   /* Memory off, or nothing recalled yet: only the documented side is honest. */
   if (!recall) {
     return (
-      <div className="rounded-[7px] border border-dashed border-line2 bg-sunken/40 px-4 py-5">
-        <Documented route="Written policy only — organisational memory was not searched for this answer." />
+      <div className="echo-split min-h-[112px]">
+        <div className="flex flex-col justify-center px-6">
+          <ColumnHead title="Policy" dot="empty" meta="written rule" />
+          <p className="mt-3 text-[14px] leading-[1.6] text-ink2">
+            Institutional memory was not searched for this answer, so the written
+            route is the whole of it.
+          </p>
+        </div>
+        <div aria-hidden="true" className="echo-split-rule" />
+        <div className="flex flex-col justify-center px-6">
+          <ColumnHead title="Practice" dot="empty" meta="not searched" />
+          <p className="mt-3 text-[14px] leading-[1.6] text-ink4">
+            Nothing was recalled, so there is no practice column to compare.
+          </p>
+        </div>
       </div>
     );
   }
@@ -96,47 +84,59 @@ export default function PolicyVsPractice({ recall }: { recall?: RecallResult }) 
 
   return (
     <div>
-      <div className="flex items-stretch gap-3">
-        <Documented route={recall.written_policy_route} />
-
-        <div
-          className="hidden w-7 shrink-0 flex-col items-center sm:flex"
-          aria-hidden="true"
-        >
-          <span className="w-px flex-1 bg-line" />
-          <span className="my-1.5 rounded-[3px] border border-line bg-surface px-1 py-[2px] font-mono text-[9px] uppercase tracking-[0.1em] text-ink4">
-            vs
-          </span>
-          <span className="w-px flex-1 bg-line" />
+      <div className="echo-split min-h-[112px]">
+        <div className="flex flex-col justify-center px-6">
+          <ColumnHead title="Policy" dot="empty" meta="written rule" />
+          <p className="mt-3 text-[14px] leading-[1.6] text-ink2">{recall.written_policy_route}</p>
         </div>
 
-        <Observed recall={recall} />
+        {/* the rule between them: neutral until a gap exists, then it is the
+            most important thing in the comparison */}
+        <div aria-hidden={!gap} className={cx("echo-split-rule relative", gap && "echo-gap-rule")}>
+          {gap && (
+            <span
+              className="echo-gap-dot"
+              role="img"
+              aria-label="A gap was found between policy and practice"
+            />
+          )}
+        </div>
+
+        <div className="flex flex-col justify-center px-6">
+          {has ? (
+            <>
+              <ColumnHead title="Practice" dot="filled" meta="historical precedent" />
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="font-mono text-[20px] font-semibold leading-none tracking-[-0.02em] text-ink">
+                  {st.similar_cases}
+                </span>
+                <span className="text-[14px] leading-[1.6] text-ink2">
+                  {st.similar_cases === 1 ? "case" : "cases"}
+                </span>
+                <span className="ml-auto font-mono text-[14px] tabular-nums text-teal">
+                  {st.approved}/{st.similar_cases} approved
+                </span>
+              </div>
+              {top && (
+                <div className="mt-2 flex items-center gap-2">
+                  <ProvenanceChip kind="evidence" />
+                  <p className="text-[12px] leading-[1.6] text-ink3">
+                    Condition · <span className="text-ink2">{top.label}</span> ×{top.count}
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <ColumnHead title="Practice" dot="empty" meta="no record" />
+              <EmptyPractice />
+            </>
+          )}
+        </div>
       </div>
 
       {gap && (
-        <div
-          className={cx(
-            "echo-rise mt-4 flex items-start gap-2.5 rounded-[7px] border border-brass-soft bg-brass-wash px-3.5 py-3",
-          )}
-        >
-          <span className="mt-[2px]">
-            <Divergence />
-          </span>
-          <div className="min-w-0">
-            <div className="text-[9.5px] font-semibold uppercase leading-none tracking-[0.15em] text-brass">
-              Observed gap
-            </div>
-            <p className="mt-1.5 text-[12.5px] leading-[1.6] text-ink2">{gap}</p>
-          </div>
-        </div>
-      )}
-
-      {recall.no_history && (
-        <p className="mt-3 text-[11.5px] leading-[1.6] text-ink3">
-          Nothing in memory matches this vendor and exception type, so the
-          observed column stays empty. Echo is advising from the written policy
-          alone.
-        </p>
+        <GapIndicator gapText={gap} />
       )}
     </div>
   );

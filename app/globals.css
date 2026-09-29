@@ -1,62 +1,65 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   Echo — "Archive"
-   ---------------------------------------------------------------------------
-   Echo is an investigation desk, not a chat app. The visual language borrows
-   from case files and audit ledgers rather than from AI product marketing:
-   warm paper, hairline rules, monospaced figures, and one restrained accent.
+   Echo — the visual system.
 
-   The accent is a deep petrol teal. Teal reads institutional and calm, and it
-   keeps the product clearly out of the indigo/purple "AI dashboard" register.
-   Brass is reserved for exactly one meaning: the gap between what the policy
-   says and what the company actually did. It is never decorative.
+   Nothing in this file is allowed to invent a size. There are exactly three
+   radii (8, 12, 16), one hairline border, one spacing rhythm, and seven type
+   sizes. A component that needs something outside those sets is a component
+   with a mistake in it, not a system that needs widening.
    =========================================================================== */
 
 @theme {
-  /* surfaces — warm, not clinical */
-  --color-base: #f4f2ee;
-  --color-surface: #fbfaf8;
-  --color-sunken: #edeae4;
-  --color-rail: #f1efea;
-  --color-line: #e3dfd7;
-  --color-line2: #d1ccc1;
+  /* surfaces */
+  --color-base: #070a0f;
+  --color-surface: #0b0f15;
+  --color-surface-2: #0e131a;
+  --color-sunken: #111720;
+  --color-rail: rgba(11, 15, 21, 0.8);
 
-  /* petrol — the identity */
-  --color-teal: #0c615c;
-  --color-teal-deep: #084a46;
-  --color-teal-soft: #b9d8d3;
-  --color-teal-wash: #edf4f2;
+  /* ink — the four steps of text, and no more */
+  --color-ink: #e8edf2;
+  --color-ink2: #8994a4;
+  --color-ink3: #566171;
+  --color-ink4: #4a5361;
 
-  /* brass — the policy/practice gap. One meaning only. */
-  --color-brass: #8a6420;
-  --color-brass-soft: #e3d4ae;
-  --color-brass-wash: #faf5e8;
+  /* structure */
+  --color-line: #1d2630;
+  --color-line2: #2a3441;
 
-  /* ink */
-  --color-ink: #17181a;
-  --color-ink2: #4b4e53;
-  --color-ink3: #767a80;
-  --color-ink4: #9ba0a6;
+  /* signal */
+  --color-teal: #42d3c1;
+  --color-teal-soft: rgba(66, 211, 193, 0.3);
+  --color-teal-wash: rgba(66, 211, 193, 0.08);
+  --color-brass: #d8a343;
+  --color-brass-soft: rgba(216, 163, 67, 0.3);
+  --color-brass-wash: rgba(216, 163, 67, 0.08);
+  --color-iris: #8b93c9;
+  --color-iris-soft: rgba(139, 147, 201, 0.3);
+  --color-iris-wash: rgba(139, 147, 201, 0.08);
+  --color-good: #43d19e;
+  --color-warn: #d8a343;
+  --color-stop: #df5d5d;
 
-  /* semantic, desaturated so they sit inside the paper */
-  --color-good: #1c6b4a;
-  --color-stop: #a33a32;
-  --color-warn: #8a6420;
+  /* type */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* depth — the centre sheet lifts off the rails */
-  --shadow-soft: 0 1px 2px rgba(23, 24, 26, 0.05), 0 1px 1px rgba(23, 24, 26, 0.03);
-  --shadow-raise: 0 8px 20px -8px rgba(23, 24, 26, 0.18), 0 1px 3px rgba(23, 24, 26, 0.05);
-  --shadow-sheet: 0 1px 2px rgba(23, 24, 26, 0.04), 0 12px 32px -20px rgba(23, 24, 26, 0.16);
-  --shadow-panel: 0 24px 60px -24px rgba(23, 24, 26, 0.3), 0 2px 8px rgba(23, 24, 26, 0.06);
+  --shadow-panel: 0 28px 70px -28px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.5);
+}
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+:root {
+  /* the one hairline, as a value, so nothing can quietly invent a second */
+  --line: #1d2630;
+  --teal: #42d3c1;
+  --brass: #d8a343;
+  --iris: #8b93c9;
+  --stop: #df5d5d;
 }
 
 html {
   height: 100%;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
@@ -64,67 +67,1062 @@ body {
   background-color: var(--color-base);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(66, 211, 193, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(66, 211, 193, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 30% at 10% 90%, rgba(216, 163, 67, 0.02) 0%, transparent 70%);
 }
 
-/* one consistent focus treatment for every interactive element */
+/* one focus treatment, everywhere */
 :focus-visible {
-  outline: 2px solid var(--color-teal);
+  outline: 2px solid var(--teal);
   outline-offset: 2px;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 /* quiet scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d1ccc1 transparent;
+  scrollbar-color: #232b3a transparent;
 }
 *::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #1b2230;
+  border-radius: 999px;
 }
 *::-webkit-scrollbar-track {
   background: transparent;
 }
-*::-webkit-scrollbar-thumb {
-  background: #dcd7cc;
-  border: 3px solid transparent;
-  background-clip: content-box;
-  border-radius: 999px;
-}
-*::-webkit-scrollbar-thumb:hover {
-  background: #c4bfb2;
-  background-clip: content-box;
+
+/* ===========================================================================
+   The field — the investigation engine visual.
+
+   A sophisticated orbital visualization behind the center workspace:
+   concentric circles, orbital rings, subtle radial lines, translucent forms.
+   Opacity 0.04–0.12. Never interferes with readability.
+   =========================================================================== */
+
+.echo-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    /* Base dark */
+    radial-gradient(ellipse at center, var(--color-base) 0%, #05080c 100%),
+    /* Subtle orbital rings */
+    radial-gradient(circle at 50% 50%, transparent 40%, rgba(66, 211, 193, 0.015) 41%, transparent 42%),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(66, 211, 193, 0.012) 56%, transparent 57%),
+    radial-gradient(circle at 50% 50%, transparent 70%, rgba(66, 211, 193, 0.008) 71%, transparent 72%),
+    radial-gradient(circle at 50% 50%, transparent 85%, rgba(66, 211, 193, 0.006) 86%, transparent 87%),
+    /* Central glow */
+    radial-gradient(ellipse 60% 40% at 50% 45%, rgba(66, 211, 193, 0.06) 0%, transparent 70%),
+    /* Secondary brass glow */
+    radial-gradient(ellipse 40% 30% at 75% 75%, rgba(216, 163, 67, 0.025) 0%, transparent 70%),
+    /* Tertiary glow */
+    radial-gradient(ellipse 30% 20% at 20% 85%, rgba(67, 209, 158, 0.02) 0%, transparent 70%);
 }
 
-::selection {
-  background: rgba(12, 97, 92, 0.16);
+/* Orbital rings as pseudo-elements on the mark container */
+.echo-field::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(400px, 60vw, 800px);
+  height: clamp(400px, 60vw, 800px);
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(66, 211, 193, 0.04);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
-/* A 1px inner highlight is what separates a warm-white sheet from warm-white
-   background. Cheaper and calmer than a heavier drop shadow. */
-.echo-sheet {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    var(--shadow-sheet);
+.echo-field::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(500px, 75vw, 1000px);
+  height: clamp(500px, 75vw, 1000px);
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(66, 211, 193, 0.025);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.echo-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: clamp(280px, 32vw, 460px);
+  height: clamp(280px, 32vw, 460px);
+  transform: translate(-50%, -50%);
+}
+
+/* two hairline rings, and no more */
+.echo-ring {
+  position: absolute;
+  border: 1px solid rgba(69, 203, 182, 0.1);
+  border-radius: 50%;
+}
+
+.echo-mark-glyph {
+  position: absolute;
+  inset: 18%;
+  color: var(--teal);
+  /* the resting strength: recognisable, never loud */
+  opacity: 0.12;
+}
+
+.echo-mark-glyph svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* the recall, travelling out from the mark — only ever raised by a real recall */
+.echo-ripple {
+  position: absolute;
+  inset: 18%;
+  border: 1px solid rgba(69, 203, 182, 0.34);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* memory off: quieter, not gone */
+.echo-field[data-memory="off"] .echo-mark-glyph {
+  opacity: 0.08;
+}
+
+.echo-field[data-memory="off"] .echo-ring {
+  border-color: rgba(69, 203, 182, 0.06);
 }
 
 /* ===========================================================================
-   Motion.
-   Every animation communicates a state change: arrival, progress, completion,
-   disclosure, feedback. Nothing decorative and nothing looping except the
-   investigation "live" dot, the skeletons, and button spinners.
+   The investigation spine
    =========================================================================== */
 
-@keyframes echo-rise {
-  from {
+.echo-spine {
+  position: relative;
+  padding-left: 24px;
+}
+
+.echo-spine::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 5px;
+  width: 1px;
+  background: var(--line);
+}
+
+.echo-stage {
+  position: relative;
+}
+
+.echo-stage::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: -24px;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--line2);
+  border-radius: 50%;
+  background: var(--color-base);
+}
+
+.echo-stage[data-state="done"]::before {
+  border-color: rgba(69, 203, 182, 0.5);
+}
+
+.echo-stage[data-state="active"]::before {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(69, 203, 182, 0.12);
+}
+
+/* ===========================================================================
+   Policy against practice — one comparison, divided
+   =========================================================================== */
+
+.echo-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  gap: 0;
+}
+
+.echo-split-rule {
+  position: relative;
+  background: var(--line);
+}
+
+.echo-gap-rule {
+  background: rgba(217, 164, 65, 0.4);
+}
+
+.echo-gap-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brass);
+  transform: translate(-50%, -50%);
+}
+
+/* ===========================================================================
+   The evidence chain — 96 × 72, uniform, joined by one line
+   =========================================================================== */
+
+.echo-trail {
+  display: flex;
+  gap: 24px;
+}
+
+.echo-trail > li {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.echo-trail > li::before {
+  content: "";
+  position: absolute;
+  top: 35px;
+  right: calc(100% + 1px);
+  width: 24px;
+  height: 1px;
+  background: var(--line);
+}
+
+.echo-trail > li:first-child::before {
+  display: none;
+}
+
+.echo-node {
+  position: relative;
+  display: flex;
+  width: 96px;
+  height: 72px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-sunken);
+  padding: 8px 12px;
+  text-align: left;
+  transition:
+    border-color 140ms ease-out,
+    background-color 140ms ease-out;
+}
+
+.echo-node:hover,
+.echo-node:focus-visible {
+  border-color: rgba(69, 203, 182, 0.4);
+  background: #121822;
+}
+
+.echo-node[data-open="true"] {
+  border-color: rgba(69, 203, 182, 0.55);
+}
+
+/* the detail lives below the chain, never inside the node */
+.echo-node-detail {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-sunken);
+  padding: 16px;
+}
+
+/* ===========================================================================
+   The queue
+   =========================================================================== */
+
+.echo-queue-row {
+  height: 64px;
+  transition: background-color 140ms ease-out;
+}
+
+.echo-queue-row[aria-current="true"] {
+  background: rgba(69, 203, 182, 0.05);
+  box-shadow: inset 2px 0 0 var(--teal);
+}
+
+.echo-queue-marker {
+  transition: transform 260ms ease-out;
+}
+
+.echo-filter {
+  transition: border-color 160ms ease-out;
+}
+
+.echo-filter:focus {
+  border-color: rgba(69, 203, 182, 0.4);
+}
+
+/* ===========================================================================
+   The memory mode selector
+   =========================================================================== */
+
+.echo-switch-group {
+  transition: background-color 140ms ease-out;
+}
+
+.echo-switch-group:hover {
+  background: var(--color-sunken);
+}
+
+.echo-switch {
+  position: relative;
+  display: block;
+  width: 36px;
+  height: 20px;
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: #131820;
+  transition: background-color 200ms ease-out, border-color 200ms ease-out;
+}
+
+.echo-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-ink4);
+  transition: transform 240ms cubic-bezier(0.32, 1.4, 0.5, 1), background-color 200ms ease-out;
+}
+
+.echo-switch-group[data-on="true"] .echo-switch {
+  border-color: rgba(69, 203, 182, 0.4);
+  background: rgba(69, 203, 182, 0.12);
+}
+
+.echo-switch-group[data-on="true"] .echo-switch-knob {
+  background: var(--teal);
+  transform: translateX(16px);
+}
+
+.echo-switch-label {
+  position: relative;
+  display: block;
+  width: 13ch;
+  height: 16px;
+}
+
+.echo-switch-label-on,
+.echo-switch-label-off {
+  position: absolute;
+  inset: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.echo-switch-label-on {
+  opacity: 0;
+}
+
+.echo-switch-group[data-on="true"] .echo-switch-label-on {
+  opacity: 1;
+}
+
+.echo-switch-group[data-on="true"] .echo-switch-label-off {
+  opacity: 0;
+}
+
+/* ===========================================================================
+   The composer — a gradient that arrives on focus and never resizes anything
+   =========================================================================== */
+
+.echo-compose {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--color-sunken);
+  transition: border-color 160ms ease-out;
+}
+
+.echo-compose::before,
+.echo-compose::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* a soft pool of light, inside the border */
+.echo-compose::before {
+  background: radial-gradient(120% 160% at 50% 120%, rgba(69, 203, 182, 0.12), transparent 70%);
+  transition: opacity 220ms ease-out;
+}
+
+/* the travelling gradient, masked to a 1px edge */
+.echo-compose::after {
+  padding: 1px;
+  background: conic-gradient(from var(--angle), var(--teal), var(--brass), var(--teal));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  transition: opacity 260ms ease-out;
+}
+
+.echo-compose:focus-within {
+  border-color: transparent;
+}
+
+.echo-compose:focus-within::before {
+  opacity: 1;
+}
+
+.echo-compose:focus-within::after {
+  opacity: 0.55;
+}
+
+.echo-send {
+  transition: background-color 140ms ease-out, color 140ms ease-out;
+}
+
+/* ===========================================================================
+   Buttons
+   =========================================================================== */
+
+.echo-btn {
+  transition:
+    transform 120ms ease-out,
+    background-color 140ms ease-out,
+    border-color 140ms ease-out;
+}
+
+.echo-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.echo-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ===========================================================================
+   The header
+   =========================================================================== */
+
+.echo-tab-ink {
+  transition: transform 240ms ease-out, width 240ms ease-out;
+}
+
+.echo-bump {
+  animation: echo-pop 320ms ease-out;
+}
+
+/* ===========================================================================
+   The memory rail
+   =========================================================================== */
+
+.echo-rail-live {
+  box-shadow: inset 2px 0 0 var(--teal);
+}
+
+.echo-rail-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(69, 203, 182, 0) 0%,
+    rgba(69, 203, 182, 0.14) 44%,
+    rgba(69, 203, 182, 0) 100%
+  );
+}
+
+.echo-frame {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-sunken);
+  padding: 16px;
+  transition: border-color 160ms ease-out;
+}
+
+.echo-frame:hover {
+  border-color: var(--line2);
+}
+
+
+
+/* ===========================================================================
+   Small shared states
+   =========================================================================== */
+
+.echo-disclose {
+  transition: opacity 200ms ease-out;
+}
+
+.echo-live {
+  animation: echo-breathe-dot 2.4s ease-in-out infinite;
+}
+
+.echo-pending-line {
+  position: relative;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.echo-pending-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(69, 203, 182, 0.5), transparent);
+  animation: echo-sweep 1.4s linear infinite;
+}
+
+.echo-skeleton {
+  background: #121721;
+}
+
+.echo-spin {
+  animation: echo-spin 700ms linear infinite;
+}
+
+.echo-pulse-once {
+  animation: echo-pop 400ms ease-out;
+}
+.echo-settle {
+  animation: echo-settle 420ms cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+
+/* ===========================================================================
+   Confidence Ring
+   =========================================================================== */
+
+.echo-confidence-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--color-ink4) 0%,
+    var(--color-ink4) var(--ring-progress, 0%),
+    var(--ring-color, var(--teal)) var(--ring-progress, 0%),
+    var(--ring-color, var(--teal)) 100%
+  );
+}
+
+.echo-confidence-ring::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--color-base);
+}
+
+.echo-confidence-ring__label {
+  position: relative;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.echo-confidence-ring__sub {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+}
+
+/* ===========================================================================
+   Condition Chain
+   =========================================================================== */
+
+.echo-condition-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.echo-condition-chain__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.echo-condition-chain__step:not(:last-child) {
+  padding-bottom: 16px;
+}
+
+.echo-condition-chain__connector {
+  position: relative;
+  flex-shrink: 0;
+  width: 2px;
+  min-height: 48px;
+  margin-top: 2px;
+  background: var(--line);
+}
+
+.echo-condition-chain__step:last-child .echo-condition-chain__connector {
+  display: none;
+}
+
+.echo-condition-chain__node {
+  position: relative;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px var(--color-base), 0 0 0 5px var(--teal);
+}
+
+.echo-condition-chain__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.echo-condition-chain__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+}
+
+.echo-condition-chain__value {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.echo-condition-chain__detail {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.5;
+}
+
+/* ===========================================================================
+   Provenance Chips
+   =========================================================================== */
+
+.echo-provenance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.echo-provenance--computed {
+  background: var(--color-teal-wash);
+  color: var(--teal);
+  border: 1px solid rgba(66, 211, 193, 0.3);
+}
+
+.echo-provenance--evidence {
+  background: var(--color-sunken);
+  color: var(--ink2);
+  border: 1px solid var(--line);
+}
+
+.echo-provenance--synthesized {
+  background: var(--color-iris-wash);
+  color: var(--iris);
+  border: 1px solid rgba(139, 147, 201, 0.3);
+}
+
+/* ===========================================================================
+   Replay Panel
+   =========================================================================== */
+
+.echo-replay {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-sunken);
+  padding: 16px;
+}
+
+.echo-replay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.echo-replay__title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+}
+
+.echo-replay__controls {
+  display: flex;
+  gap: 8px;
+}
+
+.echo-replay__control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: background-color 140ms ease-out, border-color 140ms ease-out, color 140ms ease-out;
+}
+
+.echo-replay__control:hover {
+  background: var(--color-surface-2);
+  border-color: var(--line2);
+}
+
+.echo-replay__control--active {
+  border-color: var(--teal);
+  background: var(--color-teal-wash);
+  color: var(--teal);
+}
+
+.echo-replay__comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.echo-replay__side {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.echo-replay__side--current {
+  border-color: var(--teal);
+  background: var(--color-teal-wash);
+}
+
+.echo-replay__side-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+
+.echo-replay__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.echo-replay__stat-value {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.echo-replay__stat-label {
+  font-size: 12px;
+  color: var(--ink3);
+}
+
+.echo-replay__confidence {
+  font-size: 12px;
+  color: var(--ink3);
+}
+
+.echo-replay__explanation {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink3);
+}
+
+/* ===========================================================================
+   One-line Memory Story
+   =========================================================================== */
+
+.echo-memory-story {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink2);
+}
+
+.echo-memory-story--off {
+  background: var(--color-sunken);
+  color: var(--ink3);
+}
+
+/* ===========================================================================
+   Memory OFF / No History / Error States
+   =========================================================================== */
+
+.echo-memory-off {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-sunken);
+}
+
+.echo-memory-off__icon {
+  margin-bottom: 12px;
+  color: var(--ink3);
+}
+
+.echo-memory-off__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.echo-memory-off__text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink3);
+  max-width: 28ch;
+}
+
+.echo-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-sunken);
+}
+
+.echo-error__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.echo-error__text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink3);
+  max-width: 28ch;
+}
+
+/* ===========================================================================
+   Top Investigation Summary
+   =========================================================================== */
+
+.echo-investigation-summary {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink2);
+}
+
+/* ===========================================================================
+   Policy-Practice Gap (enhanced)
+   =========================================================================== */
+
+.echo-gap-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--color-brass-wash);
+  color: var(--brass);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(216, 163, 67, 0.3);
+}
+
+.echo-gap-indicator--animate {
+  animation: echo-gap-reveal 800ms ease-out;
+}
+
+@keyframes echo-gap-reveal {
+  0% {
+    width: 0;
     opacity: 0;
-    transform: translate3d(0, 6px, 0);
+  }
+  100% {
+    width: auto;
+    opacity: 1;
+  }
+}
+
+/* ===========================================================================
+   Human Decision pulse
+   =========================================================================== */
+
+.echo-decision-pulse {
+  animation: echo-decision-pulse 1200ms ease-out;
+}
+
+@keyframes echo-decision-pulse {
+  0% {
+    box-shadow: inset 2px 0 0 var(--teal);
+  }
+  50% {
+    box-shadow: inset 2px 0 0 var(--teal), 0 0 24px rgba(66, 211, 193, 0.2);
+  }
+  100% {
+    box-shadow: inset 2px 0 0 var(--teal);
+  }
+}
+
+   Six movements, and that is the whole list: the mark breathing, the recall
+   ripple, the tab indicator, the composer edge, the memory sweep, and hover
+   lifts. Everything below is inside a no-preference query, so with reduced
+   motion the product is completely still and the mark stays at rest opacity.
+   =========================================================================== */
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes echo-mark-breath {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.11;
+  }
+  50% {
+    transform: scale(1.018);
+    opacity: 0.14;
+  }
+}
+
+@keyframes echo-ripple-out {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+
+@keyframes echo-angle {
+  to {
+    --angle: 360deg;
+  }
+}
+
+@keyframes echo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes echo-sweep {
+  from {
+    transform: translateX(-100%);
   }
   to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes echo-breathe-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
     opacity: 1;
-    transform: none;
+  }
+}
+
+@keyframes echo-pop {
+  0% {
+    transform: scale(0.85);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes echo-settle {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -137,127 +1135,52 @@ body {
   }
 }
 
-@keyframes echo-slide-in {
-  from {
-    opacity: 0;
-    transform: translate3d(10px, 0, 0);
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. the mark, breathing */
+  .echo-mark-glyph {
+    animation: echo-mark-breath 40s ease-in-out infinite;
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 
-@keyframes echo-slide-in-l {
-  from {
-    opacity: 0;
-    transform: translate3d(-10px, 0, 0);
+  .echo-field[data-memory="off"] .echo-mark-glyph {
+    animation: none;
+    opacity: 0.08;
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 
-@keyframes echo-settle {
-  0% {
-    opacity: 0;
-    transform: scale(0.84);
+  /* 2. the recall ripple */
+  .echo-ripple {
+    animation: echo-ripple-out 1200ms ease-out 1 forwards;
   }
-  55% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
-@keyframes echo-spin {
-  to {
-    transform: rotate(360deg);
+  /* 4. the composer's travelling edge */
+  .echo-compose:focus-within::after {
+    animation: echo-angle 7s linear infinite;
   }
-}
 
-@keyframes echo-live {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
+  /* 5. the memory sweep */
+  .echo-rail-sweep {
+    animation: echo-sweep 1200ms ease-out 1 forwards;
   }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.35;
-  }
-}
 
-/* skeletons: a slow, low-contrast sweep. Reads as "working", never as neon. */
-@keyframes echo-sweep {
-  from {
-    transform: translate3d(-100%, 0, 0);
+  .echo-live {
+    animation: echo-breathe-dot 2.4s ease-in-out infinite;
   }
-  to {
-    transform: translate3d(100%, 0, 0);
-  }
-}
 
-.echo-rise {
-  animation: echo-rise 260ms cubic-bezier(0.22, 0.7, 0.3, 1) both;
-}
-.echo-fade {
-  animation: echo-fade 200ms ease-out both;
-}
-.echo-slide-in {
-  animation: echo-slide-in 220ms cubic-bezier(0.22, 0.7, 0.3, 1) both;
-}
-.echo-slide-in-l {
-  animation: echo-slide-in-l 220ms cubic-bezier(0.22, 0.7, 0.3, 1) both;
-}
-.echo-settle {
-  animation: echo-settle 320ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
-}
-.echo-spin {
-  animation: echo-spin 720ms linear infinite;
-}
-.echo-live {
-  animation: echo-live 1.4s ease-in-out infinite;
-}
-.echo-skeleton {
-  position: relative;
-  overflow: hidden;
-  background: var(--color-sunken);
-}
-.echo-skeleton::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.62),
-    transparent
-  );
-  animation: echo-sweep 1.5s ease-in-out infinite;
-}
+  .echo-pending-line::after {
+    animation: echo-sweep 1.4s linear infinite;
+  }
 
-/* reduced motion: state changes stay, movement does not */
-@media (prefers-reduced-motion: reduce) {
-  .echo-rise,
-  .echo-fade,
-  .echo-slide-in,
-  .echo-slide-in-l,
-  .echo-settle,
-  .echo-spin,
-  .echo-live,
-  .echo-skeleton::after {
-    animation: none !important;
+  .echo-spin {
+    animation: echo-spin 700ms linear infinite;
   }
-  *,
-  *::before,
-  *::after {
-    transition-duration: 1ms !important;
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
+
+  .echo-bump,
+  .echo-pulse-once {
+    animation: echo-pop 320ms ease-out;
   }
+
+  .echo-settle {
+    animation: echo-settle 420ms cubic-bezier(0.2, 1.3, 0.4, 1);
+  }
+
+
 }

@@ -1,0 +1,44 @@
+// Compiles the deterministic test suite (and the lib modules it exercises) to
+// CommonJS in .test-build so it can be run with plain `node`.
+//
+// This exists because lib/pattern_memory.ts imports "./hindsight" without an
+// extension, which is what Next.js requires but plain node type-stripping does
+// not resolve. Compiling to CJS sidesteps the difference without adding a
+// dependency or changing the import style the app depends on.
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "outDir": "../.test-build",
+    "rootDir": ".."
+  },
+  "include": [
+    "../lib/hindsight.ts",
+    "../lib/pattern_memory.ts",
+    "../lib/echo_agent_core.ts",
+    "../lib/confidence.ts",
+    "../lib/grounding.ts",
+    "../lib/replay.ts",
+    "../lib/echo_seed_data.json",
+    "./test-corpus.ts",
+    "./pattern-memory-tests.ts",
+    "./recall-contract-tests.ts",
+    "./cold-start-tests.ts",
+    "./seed-hindsight.ts",
+    "./shape-probe.ts",
+    "./expansion-util.ts",
+    "./generate-expansion.ts",
+    "./echo_expansion.json",
+    "./seed-expansion.ts",
+    "./data-quality-tests.ts",
+    "./grounding-tests.ts",
+    "./replay-tests.ts"
+  ]
+}

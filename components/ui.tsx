@@ -1,57 +1,30 @@
 "use client";
-// Small shared primitives: class helper, micro-labels, chips, disclosure, the
-// numbered section block the investigation is built from, and the two hooks the
-// motion layer needs.
+// Shared primitives.
+//
+// Deliberately few, and deliberately rigid. Every label in the product is the
+// same size; every stage hangs from the same hairline; the memory frames are one
+// component so they cannot drift apart. Spacing comes from the 4/8/12/16/24/32
+// rhythm and nothing else.
 
 import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export const cx = (...parts: (string | false | null | undefined)[]) =>
   parts.filter(Boolean).join(" ");
 
 /* ------------------------------------------------------------------- labels */
 
+/** The one label style. 11px, uppercase, tracked. */
 export function Lbl({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={cx(
-        "text-[9.5px] font-semibold uppercase leading-none tracking-[0.15em] text-ink3",
+        "text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-ink3",
         className,
       )}
     >
       {children}
     </div>
-  );
-}
-
-export function Chip({
-  children,
-  accent = false,
-  brass = false,
-  mono = false,
-  className,
-}: {
-  children: ReactNode;
-  accent?: boolean;
-  brass?: boolean;
-  mono?: boolean;
-  className?: string;
-}) {
-  return (
-    <span
-      className={cx(
-        "inline-flex items-center gap-1 rounded-[4px] border px-1.5 py-[2px] text-[10.5px] leading-[1.35]",
-        mono && "font-mono",
-        accent
-          ? "border-teal-soft bg-teal-wash text-teal"
-          : brass
-            ? "border-brass-soft bg-brass-wash text-brass"
-            : "border-line bg-sunken text-ink2",
-        className,
-      )}
-    >
-      {children}
-    </span>
   );
 }
 
@@ -76,58 +49,86 @@ export function Chevron({ open, className }: { open: boolean; className?: string
   );
 }
 
-/* ------------------------------------------------------------------ section */
+/* -------------------------------------------------------------------- spine */
+
+/** The hairline every stage in the investigation hangs from. */
+export function Spine({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cx("echo-spine", className)}>{children}</div>;
+}
 
 /**
- * A numbered block in the investigation file: step number, label, and a rule
- * that runs to the right margin. Sections are separated by rules rather than
- * boxed in cards, so a long dossier stays readable as one document.
+ * One stage of the enquiry. The node on the spine is the only state: unlit
+ * before it is reached, teal once it exists.
  */
-export function Section({
+export function Stage({
   n,
   label,
   aside,
+  state = "done",
   children,
   className,
 }: {
   n: string;
   label: string;
   aside?: ReactNode;
+  state?: "todo" | "active" | "done";
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
-    <section className={cx("border-t border-line pt-4 first:border-t-0 first:pt-0", className)}>
-      <div className="flex items-center gap-2.5">
-        <span className="font-mono text-[10px] tabular-nums leading-none text-ink4">{n}</span>
+    <section className={cx("echo-stage", className)} data-state={state}>
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-[12px] font-semibold tabular-nums leading-none text-ink4">
+          {n}
+        </span>
         <Lbl className="shrink-0 text-ink2">{label}</Lbl>
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
         {aside && <span className="shrink-0">{aside}</span>}
       </div>
-      <div className="mt-3.5">{children}</div>
+      <div className="mt-3">{children}</div>
     </section>
   );
 }
 
-/** A label/value row. Used in dense read-only fact blocks. */
-export function Fact({ k, v, mono = false }: { k: ReactNode; v: ReactNode; mono?: boolean }) {
+/* -------------------------------------------------------------------- frame */
+
+/**
+ * The memory rail's frame. Three of these, and because they are one component
+ * they cannot end up different widths, radii, borders or padding.
+ */
+export function Frame({
+  title,
+  meta,
+  children,
+  className,
+}: {
+  title: string;
+  meta?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="flex items-baseline justify-between gap-3 py-[5px]">
-      <dt className="shrink-0 text-[11px] text-ink3">{k}</dt>
-      <dd className={cx("min-w-0 text-right text-[11.5px] text-ink2", mono && "font-mono")}>{v}</dd>
-    </div>
+    <section className={cx("echo-frame", className)}>
+      <div className="flex items-center gap-2">
+        <h3 className="text-[12px] font-semibold uppercase leading-none tracking-[0.12em] text-ink3">
+          {title}
+        </h3>
+        {meta && <span className="ml-auto shrink-0 font-mono text-[12px] text-ink4">{meta}</span>}
+      </div>
+      <div className="mt-3">{children}</div>
+    </section>
   );
 }
 
 /* -------------------------------------------------------------- disclosure */
 
-/** Smooth expand/collapse using the grid-rows technique. */
+/** Smooth expand/collapse: instant height, animated opacity. */
 export function Disclosure({
   title,
   meta,
   children,
   defaultOpen = false,
-  right,
 }: {
   title: string;
   meta?: ReactNode;
@@ -138,29 +139,24 @@ export function Disclosure({
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border-t border-line">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="group flex min-w-0 flex-1 items-center gap-2 py-2.5 text-left"
-        >
-          <Chevron open={open} className="shrink-0 text-ink4 transition-colors group-hover:text-ink2" />
-          <span className="truncate text-[11.5px] font-medium uppercase tracking-[0.06em] text-ink2 transition-colors group-hover:text-ink">
-            {title}
-          </span>
-          {meta && <span className="shrink-0 font-mono text-[10px] text-ink4">{meta}</span>}
-        </button>
-        {right}
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="group flex min-h-[44px] w-full items-center gap-2 py-2 text-left"
+      >
+        <Chevron open={open} className="shrink-0 text-ink4 group-hover:text-ink2" />
+        <span className="truncate text-[13px] text-ink2 group-hover:text-ink">{title}</span>
+        {meta && <span className="ml-auto shrink-0 font-mono text-[12px] text-ink4">{meta}</span>}
+      </button>
       <div
         className={cx(
-          "grid transition-[grid-template-rows] duration-300 ease-out",
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+          "echo-disclose grid",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         )}
       >
         <div className="overflow-hidden">
-          <div className="pb-3.5">{children}</div>
+          <div className="pb-3">{children}</div>
         </div>
       </div>
     </div>
@@ -181,11 +177,8 @@ export function useReducedMotion() {
   return reduced;
 }
 
-/**
- * Counts from 0 to `target`, then reports done. Under reduced motion it jumps
- * straight to the final value.
- */
-export function useCountUp(target: number, duration = 900) {
+/** Counts from 0 to `target`, then reports done. Under reduced motion it jumps. */
+export function useCountUp(target: number, duration = 400) {
   const reduced = useReducedMotion();
   const [n, setN] = useState(0);
   const [done, setDone] = useState(false);

@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import EchoMark from "./EchoMark";
+import EchoField from "./EchoField";
 import CaseList from "./CaseList";
 import Investigation from "./Investigation";
 import MemoryRail from "./MemoryRail";
@@ -154,62 +155,110 @@ function TopBar({
   onSettings: () => void;
   settings: boolean;
 }) {
+  /* The history count only ever changes because a real resolution was recorded,
+     so the one-shot bump is bound to that number and nothing else. */
+  const seen = useRef(historyCount);
+  const [bumped, setBumped] = useState(false);
+
+  /* Measure the active tab so the single indicator can travel to it. */
+  const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
+  const [ink, setInk] = useState({ left: 0, width: 0 });
+
+  useEffect(() => {
+    const nav = tabRefs.current[tab];
+    if (!nav) return;
+    const measure = () =>
+      setInk({ left: nav.offsetLeft, width: nav.offsetWidth });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, [tab, queueCount, historyCount]);
+
+  useEffect(() => {
+    if (historyCount === seen.current) return;
+    seen.current = historyCount;
+    setBumped(true);
+    const t = window.setTimeout(() => setBumped(false), 340);
+    return () => window.clearTimeout(t);
+  }, [historyCount]);
+
   return (
-    <header className="relative z-20 flex h-[46px] shrink-0 items-center gap-3 border-b border-line bg-surface px-3">
+    <header className="relative z-20 flex h-[64px] shrink-0 items-center gap-3 border-b border-line bg-surface px-6">
       <button
         type="button"
         onClick={onOpenQueue}
         aria-label="Open exception queue"
-        className="rounded p-1 text-ink2 transition-colors hover:text-ink lg:hidden"
+        className="-ml-2 flex h-[44px] w-[44px] items-center justify-center text-ink3 hover:text-ink lg:hidden"
       >
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       </button>
 
       <div className="flex shrink-0 items-center gap-2">
-        <EchoMark size={21} className="text-ink" accent="#0c615c" />
-        <div className="leading-none">
-          <div className="text-[13px] font-semibold tracking-tight text-ink">Echo</div>
-          <div className="mt-[3px] hidden text-[9px] uppercase tracking-[0.15em] text-ink3 sm:block">
-            AP Exception Intelligence
-          </div>
-        </div>
+        <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[8px] border border-line">
+          <EchoMark size={18} className="text-teal" accent="#45cbb6" />
+        </span>
+        <span className="text-[18px] font-semibold tracking-tight text-ink">Echo</span>
       </div>
 
-      <nav className="ml-2 hidden items-center gap-0.5 lg:flex" aria-label="Queue view">
+      {/* one ink that slides between the two views rather than two indicators
+          that blink in and out */}
+      <nav
+        className="relative ml-2 hidden h-[44px] items-center lg:flex"
+        aria-label="Queue view"
+      >
         {TABS.map((t) => {
           const active = tab === t.id;
           const n = t.id === "queue" ? queueCount : historyCount;
+          const bumping = t.id === "history" && bumped;
           return (
             <button
               key={t.id}
+              ref={(el) => {
+                tabRefs.current[t.id] = el;
+              }}
               type="button"
               onClick={() => onTab(t.id)}
               aria-current={active ? "page" : undefined}
               className={cx(
-                "rounded-[5px] px-2 py-1.5 text-[12px] transition-colors duration-150",
-                active ? "bg-sunken font-medium text-ink" : "text-ink3 hover:bg-sunken hover:text-ink2",
+                "relative flex min-h-[44px] items-center gap-2 rounded-[8px] px-3 text-[14px]",
+                active ? "font-medium text-ink" : "text-ink3 hover:text-ink2",
               )}
             >
               {t.label}
-              <span className="ml-1.5 font-mono text-[9.5px] text-ink4">{n}</span>
+              <span
+                className={cx(
+                  "font-mono text-[12px] text-ink4",
+                  bumping && "echo-bump text-teal",
+                )}
+              >
+                {n}
+              </span>
             </button>
           );
         })}
+        {ink.width > 0 && (
+          <span
+            aria-hidden="true"
+            className="echo-tab-ink absolute bottom-0 left-0 h-[2px] rounded-full bg-teal"
+            style={{ width: ink.width, transform: `translateX(${ink.left}px)` }}
+          />
+        )}
       </nav>
 
       <div className="ml-auto flex min-w-0 items-center gap-2">
-        <span className="hidden items-center gap-1.5 md:flex">
+        <span className="hidden items-center gap-2 md:flex">
           <span aria-hidden="true" className="h-[5px] w-[5px] rounded-full bg-good" />
-          <span className="text-[10.5px] text-ink3">AP Operations</span>
+          <span className="text-[12px] text-ink3">AP Operations</span>
         </span>
 
         <button
           type="button"
           onClick={onOpenMemory}
           aria-label="Open institutional memory"
-          className="rounded-[6px] border border-line2 px-2 py-[5px] text-[10.5px] font-medium text-ink2 transition-colors hover:border-ink4 hover:text-ink xl:hidden"
+          className="flex min-h-[44px] items-center rounded-[12px] border border-line px-3 text-[14px] font-medium text-ink2 hover:text-ink xl:hidden"
         >
           Memory
         </button>
@@ -221,9 +270,9 @@ function TopBar({
           onClick={onSettings}
           aria-label="Settings"
           aria-expanded={settings}
-          className="rounded-[6px] p-1.5 text-ink3 transition-colors hover:bg-sunken hover:text-ink"
+          className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px] text-ink3 hover:text-ink"
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <circle cx="8" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.3" />
             <path
               d="M8 1.6v1.7M8 12.7v1.7M14.4 8h-1.7M3.3 8H1.6M12.5 3.5l-1.2 1.2M4.7 11.3l-1.2 1.2M12.5 12.5l-1.2-1.2M4.7 4.7 3.5 3.5"
@@ -253,10 +302,15 @@ export default function EchoApp() {
 
   const [stage, setStage] = useState(0);
   const [evidenceReady, setEvidenceReady] = useState(false);
+  /** The last request to this case failed; the investigation stays open. */
+  const [failed, setFailed] = useState(false);
+  /** Bumped once per real recall, purely to fire the ripple on the field. */
+  const [ripple, setRipple] = useState(0);
+  /** Bumped once per real saved resolution, to sweep the memory rail. */
+  const [savePulse, setSavePulse] = useState(0);
 
   const [action, setAction] = useState<{ kind: string; done: boolean } | null>(null);
   const [decision, setDecision] = useState<"approve" | "reject">("approve");
-  const [remember, setRemember] = useState<"idle" | "confirm" | "saving">("idle");
   const [resolved, setResolved] = useState<string[]>([]);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
@@ -311,6 +365,7 @@ export default function EchoApp() {
     setInput("");
     setBusy(true);
     setStage(0);
+    setFailed(false);
     if (tAction.current) clearTimeout(tAction.current);
 
     let ok = false;
@@ -334,8 +389,24 @@ export default function EchoApp() {
       const recalled = tools.includes("recall_exception_pattern");
       if (!recalled || !ev.recall || ev.recall.no_history) setEvidenceReady(true);
 
+      /* The ripple stands for memory actually being searched and found. It is
+         only raised on a successful response that carries real comparable
+         decisions, and never while memory is off. */
+      if (
+        memoryOn &&
+        recalled &&
+        ev.recall &&
+        !ev.recall.no_history &&
+        ev.recall.similar_cases.length > 0
+      ) {
+        setRipple((n) => n + 1);
+      }
+
       if (tools.includes("save_resolution") && ev.saved && !ev.saved.error) {
         push("Resolution recorded", "ok");
+        /* The rail lights up because a decision was genuinely written to
+           institutional memory, never on a timer or a guess. */
+        setSavePulse((n) => n + 1);
         const key = caseKey.current;
         if (key) setResolved((k) => (k.includes(key) ? k : [...k, key]));
         const retained = ev.saved.retained;
@@ -347,11 +418,11 @@ export default function EchoApp() {
       if (tools.includes("promote_to_policy")) push("Policy draft created", "info");
       if (kind === "escalate") push("Case escalated", "info");
     } catch {
-      setLog((p) => [
-        ...p,
-        { role: "assistant", content: "Something went wrong. Please try again." },
-      ]);
-      push("Something went wrong", "info");
+      /* The investigation is still open: the case, the brief and the queue
+         selection all remain, and the workspace says plainly that the analysis
+         could not be completed. No provider detail is surfaced. */
+      setFailed(true);
+      push("Echo could not complete this analysis", "info");
     } finally {
       setBusy(false);
       setStage(0);
@@ -372,6 +443,7 @@ export default function EchoApp() {
     setActiveCase(c);
     setDrawer(null);
     setEvidenceReady(false);
+    setFailed(false);
     setAction(null);
     void send(c.message, undefined, true);
   }
@@ -382,7 +454,9 @@ export default function EchoApp() {
   const listItems = tab === "history" ? CASES.filter((c) => resolved.includes(c.key)) : CASES;
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-base text-ink">
+    <div className="relative isolate flex h-dvh flex-col overflow-hidden bg-base text-ink">
+      <EchoField ripple={ripple} memoryOn={memoryOn} />
+
       <TopBar
         tab={tab}
         onTab={setTab}
@@ -405,18 +479,18 @@ export default function EchoApp() {
             onClick={() => setSettings(false)}
             className="fixed inset-0 z-20 cursor-default"
           />
-          <div className="echo-rise absolute right-3 top-[40px] z-30 w-[264px] rounded-[8px] border border-line bg-surface p-3.5 shadow-panel">
+          <div className="absolute right-6 top-16 z-30 mt-2 w-[288px] rounded-[12px] border border-line bg-surface p-4 shadow-panel">
             <Lbl>System</Lbl>
-            <dl className="mt-2.5 grid grid-cols-[84px_1fr] gap-x-3 gap-y-2 text-[11.5px] leading-[1.45]">
+            <dl className="mt-3 grid grid-cols-[80px_1fr] gap-x-4 gap-y-2 text-[12px] leading-[1.6]">
               <dt className="text-ink4">Memory</dt>
               <dd className="text-ink2">
-                {memoryOn ? "On — institutional memory searched" : "Off — written policy only"}
+                {memoryOn ? "Active" : "Off — written policy only"}
               </dd>
               <dt className="text-ink4">Model</dt>
-              <dd className="font-mono text-[10.5px] text-ink2">openai/gpt-oss-120b</dd>
+              <dd className="truncate font-mono text-ink2">openai/gpt-oss-120b</dd>
               <dt className="text-ink4">Source</dt>
               <dd className="text-ink2">
-                {activeEv?.recall?.memory_source === "hindsight" ? "Hindsight Cloud" : "Local fallback"}
+                {activeEv?.recall?.memory_source === "hindsight" ? "Hindsight" : "Local"}
               </dd>
               <dt className="text-ink4">Evidence</dt>
               <dd className="text-ink2">
@@ -424,10 +498,10 @@ export default function EchoApp() {
                   ? `${activeEv.recall.stats.similar_cases} comparable case${
                       activeEv.recall.stats.similar_cases === 1 ? "" : "s"
                     }`
-                  : "—"}
+                  : "not searched"}
               </dd>
             </dl>
-            <p className="mt-3 border-t border-line pt-2.5 text-[11px] leading-[1.6] text-ink4">
+            <p className="mt-4 border-t border-line pt-3 text-[12px] leading-[1.6] text-ink4">
               Echo advises. A person decides. Nothing is approved or paid
               automatically, and institutional memory is only written when a
               human confirms it.
@@ -436,28 +510,33 @@ export default function EchoApp() {
         </>
       )}
 
-      <div className="flex min-h-0 flex-1">
-        {/* ---------------------------------------------- zone 1: the queue */}
-        <div className="hidden lg:flex">
-          <CaseList
-            title={tab === "history" ? "Resolved" : "Exception Queue"}
-            items={listItems}
-            activeKey={activeCase?.key ?? null}
-            onSelect={openCase}
-            busy={busy}
-            resolved={resolved}
-          />
-        </div>
+      {/* The workspace: 300 / 1fr / 360, 24px between, never wider than 1440,
+          and centred. The three columns share a top, a content line and a
+          bottom edge because nothing in them decides its own height. */}
+      <div className="relative z-10 flex min-h-0 flex-1 justify-center">
+        <div className="grid w-full max-w-[1440px] grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_360px]">
+          {/* ---------------------------------------------- zone 1: the queue */}
+          <div className="hidden min-h-0 lg:flex">
+            <CaseList
+              title={tab === "history" ? "Resolved" : "Exception Queue"}
+              items={listItems}
+              activeKey={activeCase?.key ?? null}
+              onSelect={openCase}
+              busy={busy}
+              resolved={resolved}
+            />
+          </div>
 
-        {/* ------------------------------------------- zone 2: investigation */}
-        <main className="flex min-w-0 flex-1 flex-col bg-surface">
-          <Investigation
-            c={activeCase}
-            log={log}
-            memoryOn={memoryOn}
-            busy={busy}
-            stage={stage}
-          />
+          {/* ------------------------------------------- zone 2: investigation */}
+          <main className="flex min-w-0 flex-col">
+            <Investigation
+              c={activeCase}
+              log={log}
+              memoryOn={memoryOn}
+              busy={busy}
+              stage={stage}
+              failed={failed}
+            />
 
           {activeCase && (
             <DecisionBar
@@ -475,15 +554,11 @@ export default function EchoApp() {
                 void send(DECISION_REJECT, "reject");
               }}
               recorded={recorded}
-              remember={remember}
-              onRemember={() => setRemember("confirm")}
-              onRememberCancel={() => setRemember("idle")}
               onRememberConfirm={() => {
-                setRemember("saving");
                 const approver = activeEv?.owner?.owners[0]?.name;
                 const text =
                   decision === "reject" ? rejectText(approver) : RESOLVE_APPROVED;
-                void send(text, "remember").then(() => setRemember("idle"));
+                void send(text, "remember");
               }}
               promo={memoryOn ? activeEv?.promo : undefined}
               promote={btn("promote")}
@@ -491,24 +566,28 @@ export default function EchoApp() {
             />
           )}
 
+          {/* the composer decides whether it is an invitation or a full
+              composer, so it is always mounted and never jumps */}
           <AskEchoInput
             value={input}
             onChange={setInput}
-            onSend={() => void send(input)}
+            onSend={(v) => void send(v ?? input)}
             busy={busy}
-            contextLabel={activeCase ? activeCase.invoiceNo : null}
-          />
-        </main>
+            contextLabel={activeCase?.invoiceNo ?? null}
+            />
+          </main>
 
-        {/* ------------------------------------ zone 3: institutional memory */}
-        <aside className="hidden w-[320px] shrink-0 border-l border-line xl:block">
-          <MemoryRail
-            memoryOn={memoryOn}
-            evidence={activeEv ?? {}}
-            evidenceReady={evidenceReady}
-            onSettled={() => setEvidenceReady(true)}
-          />
-        </aside>
+          {/* ------------------------------------ zone 3: institutional memory */}
+          <div className="hidden min-h-0 xl:flex">
+            <MemoryRail
+              memoryOn={memoryOn}
+              evidence={activeEv ?? {}}
+              evidenceReady={evidenceReady}
+              onSettled={() => setEvidenceReady(true)}
+              pulse={savePulse}
+            />
+          </div>
+        </div>
       </div>
 
       {/* --------------------------------------------------------- drawers */}
@@ -518,10 +597,10 @@ export default function EchoApp() {
             type="button"
             aria-label="Close panel"
             onClick={() => setDrawer(null)}
-            className="absolute inset-0 bg-ink/25"
+            className="absolute inset-0 bg-black/55"
           />
           {drawer === "queue" ? (
-            <div className="echo-slide-in-l absolute left-0 top-0 h-full shadow-panel">
+            <div className="absolute left-0 top-0 h-full">
               <CaseList
                 title={tab === "history" ? "Resolved" : "Exception Queue"}
                 items={listItems}
@@ -533,12 +612,13 @@ export default function EchoApp() {
               />
             </div>
           ) : (
-            <div className="echo-slide-in absolute right-0 top-0 h-full w-[320px] border-l border-line shadow-panel">
+            <div className="absolute right-0 top-0 h-full">
               <MemoryRail
                 memoryOn={memoryOn}
                 evidence={activeEv ?? {}}
                 evidenceReady={evidenceReady}
                 onSettled={() => setEvidenceReady(true)}
+                pulse={savePulse}
                 onClose={() => setDrawer(null)}
               />
             </div>

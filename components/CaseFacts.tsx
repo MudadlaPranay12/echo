@@ -1,98 +1,75 @@
 "use client";
-// CaseFacts — the numbers before any argument.
-// An investigator starts with the ledger, not the summary. Four figures, set in
-// the mono face with tabular figures, separated by hairlines instead of cards.
+// CaseFacts — the money, before any argument.
+//
+// A four-column grid of identical cells. Equal width, equal height, equal
+// padding, one number size. No metric is allowed to look more important than
+// another, because at this point none of them is: they are the four quantities
+// the whole investigation is about.
+//
+// Financial numbers: 32-36px per spec.
 
 import type { CaseItem } from "./echoTypes";
 import { cx } from "./ui";
 
-/** The written policy's tolerance band, as stated in the agent's policy route. */
-const TOLERANCE_PCT = 2;
-
 const inr = (n: number) => "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
 
-function Metric({
+function Cell({
   label,
   value,
-  sub,
+  meta,
   tone,
-  delay,
 }: {
   label: string;
   value: string;
-  sub?: string;
-  tone?: "good" | "warn" | "stop" | "mute";
-  delay: number;
+  meta?: string;
+  tone?: "good" | "warn" | "stop";
 }) {
   return (
-    <div
-      className="echo-rise min-w-0 flex-1 px-4 py-3 first:pl-0 last:pr-0"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="text-[9.5px] font-semibold uppercase leading-none tracking-[0.15em] text-ink3">
+    <div className="flex h-[104px] flex-col justify-center gap-1.5 border-r border-line px-5 last:border-r-0">
+      <div className="text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-ink4">
         {label}
       </div>
       <div
         className={cx(
-          "mt-2 font-mono text-[15px] leading-none tracking-tight tabular-nums",
+          "font-mono text-[34px] font-semibold leading-none tracking-[-0.02em] tabular-nums",
           tone === "good" && "text-good",
           tone === "warn" && "text-warn",
           tone === "stop" && "text-stop",
-          (!tone || tone === "mute") && "text-ink",
+          !tone && "text-ink",
         )}
       >
         {value}
       </div>
-      {sub && (
-        <div className="mt-1.5 truncate text-[10.5px] leading-none text-ink4">{sub}</div>
-      )}
+      {meta && <div className="font-mono text-[12px] leading-none text-ink4">{meta}</div>}
     </div>
   );
 }
 
 export default function CaseFacts({ c }: { c: CaseItem }) {
   const variance = c.po !== null ? ((c.invoice - c.po) / c.po) * 100 : null;
-  const over = variance !== null && Math.abs(variance) > TOLERANCE_PCT;
+  const over = variance !== null && Math.abs(variance) > 2;
   const far = variance !== null && Math.abs(variance) >= 5;
 
   return (
-    <div className="flex divide-x divide-line border-b border-line bg-sunken/45">
-      <Metric
-        label="Invoice"
-        value={inr(c.invoice)}
-        sub={c.invoiceNo}
-        delay={0}
-      />
-      <Metric
-        label="Purchase order"
+    <div className="grid grid-cols-4 border-y border-line">
+      <Cell label="Invoiced" value={inr(c.invoice)} meta="as billed" />
+      <Cell
+        label="Purchase Order"
         value={c.po === null ? "—" : inr(c.po)}
-        sub={c.poRef ?? "no reference"}
+        meta={c.poRef ?? "no reference"}
         tone={c.po === null ? "stop" : undefined}
-        delay={45}
       />
-      <Metric
+      <Cell
         label="Variance"
-        value={
-          variance === null
-            ? "—"
-            : `${variance > 0 ? "+" : ""}${Number(variance.toFixed(2))}%`
-        }
-        sub={variance === null ? "cannot be computed" : "invoice vs PO"}
-        tone={over ? (far ? "stop" : "warn") : "good"}
-        delay={90}
-      />
-      <Metric
-        label="Against policy"
-        value={variance === null ? "Missing PO" : over ? "Outside" : "Within"}
-        sub={
-          variance === null
-            ? "no PO on record"
-            : over
-              ? `${TOLERANCE_PCT}% tolerance`
-              : `${TOLERANCE_PCT}% tolerance`
-        }
+        value={variance === null ? "—" : `${Number(variance.toFixed(2))}%`}
+        meta={variance === null ? "not computable" : over ? "outside 2% tolerance" : "within 2% tolerance"}
         tone={variance === null ? "stop" : over ? (far ? "stop" : "warn") : "good"}
-        delay={135}
+      />
+      <Cell
+        label="Against Policy"
+        value={variance === null ? "Missing PO" : over ? "Outside" : "Within"}
+        meta={variance === null ? "—" : "2% tolerance"}
+        tone={variance === null ? "stop" : over ? (far ? "stop" : "warn") : "good"}
       />
     </div>
   );

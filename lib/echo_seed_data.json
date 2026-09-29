@@ -61,7 +61,7 @@
       "outcome": "approved",
       "days_to_resolve": 2,
       "note": "Small subscription add-on; retro PO accepted.",
-      "retain_text": "On 2026-01-28, Contoso Cloud Services invoice INV-CC-2210 (missing po): no PO number on invoice. Handled by Suresh Iyer. Resolution: Procurement raised a retroactive PO (PO-8012) and invoice was re-matched. Outcome: approved in 2 day(s). Note: Small subscription add-on; retro PO accepted.",
+      "retain_text": "On 2026-01-28, Contoso Cloud Services invoice INV-CC-2210 (missing po): no PO number on invoice. Invoice INR 18,400. Handled by Suresh Iyer. Resolution: Procurement raised a retroactive PO (PO-8012) and invoice was re-matched. Outcome: approved in 2 day(s). Note: Small subscription add-on; retro PO accepted.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2026-01-28T10:00:00Z"
     },
@@ -99,7 +99,7 @@
       "outcome": "approved",
       "days_to_resolve": 2,
       "note": "Same pattern as C01.",
-      "retain_text": "On 2026-03-05, Contoso Cloud Services invoice INV-CC-2244 (missing po): no PO number on invoice. Handled by Suresh Iyer. Resolution: Retroactive PO raised by procurement. Outcome: approved in 2 day(s). Note: Same pattern as C01.",
+      "retain_text": "On 2026-03-05, Contoso Cloud Services invoice INV-CC-2244 (missing po): no PO number on invoice. Invoice INR 9,750. Handled by Suresh Iyer. Resolution: Retroactive PO raised by procurement. Outcome: approved in 2 day(s). Note: Same pattern as C01.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2026-03-05T10:00:00Z"
     },
@@ -137,7 +137,7 @@
       "outcome": "rejected",
       "days_to_resolve": 5,
       "note": "Retro PO is NOT allowed above INR 50,000.",
-      "retain_text": "On 2026-04-16, Contoso Cloud Services invoice INV-CC-2261 (missing po): no PO number on invoice. Handled by Kavita Rao. Resolution: CFO refused retroactive PO above INR 50,000; vendor asked to reissue with PO. Outcome: rejected in 5 day(s). Note: Retro PO is NOT allowed above INR 50,000.",
+      "retain_text": "On 2026-04-16, Contoso Cloud Services invoice INV-CC-2261 (missing po): no PO number on invoice. Invoice INR 61,200. Handled by Kavita Rao. Resolution: CFO refused retroactive PO above INR 50,000; vendor asked to reissue with PO. Outcome: rejected in 5 day(s). Note: Retro PO is NOT allowed above INR 50,000.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2026-04-16T10:00:00Z"
     },
@@ -251,7 +251,7 @@
       "outcome": "approved",
       "days_to_resolve": 2,
       "note": "Seat true-up with prorated charge; consistent with C01 and C03.",
-      "retain_text": "On 2026-08-20, Contoso Cloud Services invoice INV-CC-2341 (missing po): no PO number on invoice. Handled by Suresh Iyer. Resolution: Retroactive PO raised by procurement after a mid-term seat true-up added licences. Outcome: approved in 2 day(s). Note: Seat true-up with prorated charge; consistent with C01 and C03.",
+      "retain_text": "On 2026-08-20, Contoso Cloud Services invoice INV-CC-2341 (missing po): no PO number on invoice. Invoice INR 12,300. Handled by Suresh Iyer. Resolution: Retroactive PO raised by procurement after a mid-term seat true-up added licences. Outcome: approved in 2 day(s). Note: Seat true-up with prorated charge; consistent with C01 and C03.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2026-08-20T10:00:00Z"
     },
@@ -454,7 +454,7 @@
       "note": "Above INR 50,000 a retro PO needs CFO sign-off, and an undocumented emergency never gets it.",
       "condition": "no documented emergency justification",
       "decision": "held",
-      "retain_text": "On 2025-09-05, Contoso Cloud Services invoice INV-CC-2272 was raised as a emergency procurement (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Handled by Kavita Rao. Decision: held. Resolution: An emergency licence renewal arrived with no PO; the CFO held it and then rejected it because the department head never documented the emergency. Condition relied on: no documented emergency justification. Outcome: rejected in 16 day(s). Note: Above INR 50,000 a retro PO needs CFO sign-off, and an undocumented emergency never gets it.",
+      "retain_text": "On 2025-09-05, Contoso Cloud Services invoice INV-CC-2272 was raised as a emergency procurement (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Invoice INR 68,400. Handled by Kavita Rao. Decision: held. Resolution: An emergency licence renewal arrived with no PO; the CFO held it and then rejected it because the department head never documented the emergency. Condition relied on: no documented emergency justification. Outcome: rejected in 16 day(s). Note: Above INR 50,000 a retro PO needs CFO sign-off, and an undocumented emergency never gets it.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2025-09-05T10:00:00Z"
     },
@@ -546,7 +546,7 @@
       "note": "No PO, no payment, however urgent the plant says it is.",
       "condition": "no retrospective PO raised",
       "decision": "held",
-      "retain_text": "On 2025-06-05, Contoso Industrial invoice INV-CI-4433 was raised as a late PO creation (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Handled by Daniel Thomas. Decision: held. Resolution: Consumables were ordered by the plant over the phone; held for 20 days and rejected because the PO was never created retrospectively. Condition relied on: no retrospective PO raised. Outcome: rejected in 20 day(s). Note: No PO, no payment, however urgent the plant says it is.",
+      "retain_text": "On 2025-06-05, Contoso Industrial invoice INV-CI-4433 was raised as a late PO creation (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Invoice INR 38,700. Handled by Daniel Thomas. Decision: held. Resolution: Consumables were ordered by the plant over the phone; held for 20 days and rejected because the PO was never created retrospectively. Condition relied on: no retrospective PO raised. Outcome: rejected in 20 day(s). Note: No PO, no payment, however urgent the plant says it is.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2025-06-05T10:00:00Z"
     },
@@ -684,7 +684,7 @@
       "note": "A framework agreement is the justification for the retro PO.",
       "condition": "retro PO against an existing framework agreement",
       "decision": "approved",
-      "retain_text": "On 2026-04-16, Zenith Procurement invoice INV-ZPR-1288 was raised as a retroactive PO (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Handled by Daniel Thomas. Decision: approved. Resolution: Fixed-fee audit support was billed without a PO; Daniel Thomas raised a retro PO against the standing framework agreement. Condition relied on: retro PO against an existing framework agreement. Outcome: approved in 3 day(s). Note: A framework agreement is the justification for the retro PO.",
+      "retain_text": "On 2026-04-16, Zenith Procurement invoice INV-ZPR-1288 was raised as a retroactive PO (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Invoice INR 39,500. Handled by Daniel Thomas. Decision: approved. Resolution: Fixed-fee audit support was billed without a PO; Daniel Thomas raised a retro PO against the standing framework agreement. Condition relied on: retro PO against an existing framework agreement. Outcome: approved in 3 day(s). Note: A framework agreement is the justification for the retro PO.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2026-04-16T10:00:00Z"
     },
@@ -776,7 +776,7 @@
       "note": "Retro POs work when they are raised promptly, not weeks later.",
       "condition": "retro PO raised within the week",
       "decision": "approved with condition",
-      "retain_text": "On 2025-07-15, Alpine Components invoice INV-AC-2229 was raised as a late PO creation (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Handled by Priya Nair. Decision: approved with condition. Resolution: An urgent replacement part shipped ahead of the PO; Priya Nair accepted it and had the PO raised retrospectively the same week. Condition relied on: retro PO raised within the week. Outcome: approved in 5 day(s). Note: Retro POs work when they are raised promptly, not weeks later.",
+      "retain_text": "On 2025-07-15, Alpine Components invoice INV-AC-2229 was raised as a late PO creation (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Invoice INR 19,400. Handled by Priya Nair. Decision: approved with condition. Resolution: An urgent replacement part shipped ahead of the PO; Priya Nair accepted it and had the PO raised retrospectively the same week. Condition relied on: retro PO raised within the week. Outcome: approved in 5 day(s). Note: Retro POs work when they are raised promptly, not weeks later.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2025-07-15T10:00:00Z"
     },
@@ -868,7 +868,7 @@
       "note": "Facilities POs under INR 20,000 are raised retro without ceremony.",
       "condition": "retro PO under INR 20,000",
       "decision": "approved",
-      "retain_text": "On 2025-01-16, Meridian Office Systems invoice INV-MO-3055 was raised as a service invoice without receipt (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Handled by Suresh Iyer. Decision: approved. Resolution: Quarterly copier servicing was billed without a PO; Suresh Iyer raised a small-value retro PO. Condition relied on: retro PO under INR 20,000. Outcome: approved in 2 day(s). Note: Facilities POs under INR 20,000 are raised retro without ceremony.",
+      "retain_text": "On 2025-01-16, Meridian Office Systems invoice INV-MO-3055 was raised as a service invoice without receipt (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Invoice INR 17,600. Handled by Suresh Iyer. Decision: approved. Resolution: Quarterly copier servicing was billed without a PO; Suresh Iyer raised a small-value retro PO. Condition relied on: retro PO under INR 20,000. Outcome: approved in 2 day(s). Note: Facilities POs under INR 20,000 are raised retro without ceremony.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2025-01-16T10:00:00Z"
     },
@@ -937,7 +937,7 @@
       "note": "Second emergency rejection for this vendor; the pattern is clear.",
       "condition": "no documented emergency justification",
       "decision": "held",
-      "retain_text": "On 2026-01-08, Meridian Office Systems invoice INV-MO-3121 was raised as a emergency procurement (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Handled by Kavya Shah. Decision: held. Resolution: An emergency toner buy-out during a supplier outage was held and then rejected for want of a written business justification. Condition relied on: no documented emergency justification. Outcome: rejected in 15 day(s). Note: Second emergency rejection for this vendor; the pattern is clear.",
+      "retain_text": "On 2026-01-08, Meridian Office Systems invoice INV-MO-3121 was raised as a emergency procurement (missing PO) exception: no PO number on the invoice. The written policy at the time said: Reject and return to vendor: no PO number. Invoice INR 22,800. Handled by Kavya Shah. Decision: held. Resolution: An emergency toner buy-out during a supplier outage was held and then rejected for want of a written business justification. Condition relied on: no documented emergency justification. Outcome: rejected in 15 day(s). Note: Second emergency rejection for this vendor; the pattern is clear.",
       "retain_context": "AP exception resolution",
       "retain_timestamp": "2026-01-08T10:00:00Z"
     },

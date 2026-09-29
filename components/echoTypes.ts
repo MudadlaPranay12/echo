@@ -8,6 +8,34 @@ export type Msg = { role: "user" | "assistant"; content: string };
 
 export type TopCondition = { label: string; count: number };
 
+export type PatternView = {
+  pattern_id: string;
+  family: string;
+  exception_pattern: string;
+  support_count: number;
+  approved_count: number;
+  rejected_count: number;
+  approval_rate: number | null;
+  confidence: string;
+  last_seen: string;
+  approvers: { name: string; count: number }[];
+  conditions: string[];
+  typical_resolution: string;
+  policy_route: string | null;
+  source: "hindsight";
+  supporting_case_ids: string[];
+  supporting_cases_on_screen: string[];
+};
+
+export type EvidenceExcluded = {
+  other_vendor: number;
+  self: number;
+  other_family: number;
+  outside_diff_window: number;
+  other_policy_band: number;
+  no_recorded_amount: number;
+} | null;
+
 export type RecallStats = {
   similar_cases: number;
   approved: number;
@@ -27,6 +55,8 @@ export type SimilarCase = {
   workaround: string;
   outcome: "approved" | "rejected";
   days: number;
+  /** The condition the finding was resolved under, read back from retained memory. */
+  condition?: string | null;
 };
 
 export type RecallArgs = {
@@ -35,23 +65,33 @@ export type RecallArgs = {
   invoice_amount_inr?: number;
   po_amount_inr?: number | null;
   invoice_no?: string;
+  synthesize?: boolean;
 };
 
 export type RecallResult = {
   memory_source: "hindsight" | "fallback";
+  memory_scope: "family" | "unscoped" | "local";
+  issue_family: string;
   no_history: boolean;
   written_policy_route: string;
+  evidence_excluded: EvidenceExcluded;
   stats: RecallStats;
   similar_cases: SimilarCase[];
+  patterns: PatternView[];
   memory_snippets: string[];
-  /** Narrative pattern from Hindsight Reflect. Advisory: never a source of numbers. */
+  /** Whether a synthesis was requested for this lookup. */
+  synthesis_requested: boolean;
+  /** Narrative policy from Hindsight Reflect. Advisory: never a source of numbers. */
   pattern_insight?: string | null;
+  /** Where the insight came from, so the UI can label it without overstating it. */
+  synthesis_source?: "none" | "reflect" | "cached" | "deterministic";
 };
 
 export type SaveResult = {
   saved_case_id: string;
   memory_source: "hindsight" | "fallback";
   retained: boolean;
+  pattern_memory_updated: boolean;
   confidence_before: string;
   confidence_after: string;
   top_condition_after: TopCondition | null;
