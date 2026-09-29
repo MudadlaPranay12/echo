@@ -12,7 +12,7 @@
 // an 11px eyebrow, a 28px case id, a 16px vendor, 13px metadata. The parser below
 // is unchanged: it only reads sections the model actually wrote.
 
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import EchoMarkdown, { splitSections } from "./echoMarkdown";
 import CaseFacts from "./CaseFacts";
 import PolicyVsPractice from "./PolicyPractice";
@@ -38,7 +38,10 @@ type Props = {
   decisionBar?: ReactNode;
 };
 
-const MEASURE = "mx-auto w-full max-w-[800px] px-6";
+/* One measure for the whole centre column, so the case identity, the ledger and
+   the enquiry all share a left edge. The track itself is allowed to be wider —
+   `max-w` only caps the line length. */
+const MEASURE = "mx-auto w-full max-w-[860px] px-6";
 
 /* ------------------------------------------------------------- reply parsing */
 
@@ -86,7 +89,7 @@ function Recommendation({ label, body }: { label: string; body: string[] }) {
   return (
     <div className="rounded-[12px] border border-teal-soft bg-teal-wash px-4 py-3">
       <div className="flex items-center gap-2">
-        <EchoMark size={14} className="shrink-0 text-teal" accent="#45cbb6" />
+        <EchoMark size={14} className="shrink-0 text-teal" />
         <Lbl className="text-teal">{label}</Lbl>
       </div>
       <div className="mt-2 text-[16px] leading-[1.6] text-ink">
@@ -129,18 +132,24 @@ function DossierSkeleton() {
 }
 
 function Empty() {
+  /* `.echo-empty` is a single centred grid cell pinned to the viewport, so the
+     whole block lands on the exact centre of the `.echo-mark` in the orbital
+     field — the icon, the heading and the description as one centred unit. The
+     copy is unchanged. */
   return (
-    <div className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
-      <span className="flex h-[48px] w-[48px] items-center justify-center rounded-[16px] border border-line bg-sunken">
-        <EchoMark size={24} className="text-ink3" accent="#8b97a8" />
-      </span>
-      <h1 className="mt-6 text-[20px] font-semibold tracking-[-0.02em] text-ink">
-        Open an exception to begin
-      </h1>
-      <p className="mt-3 max-w-[48ch] text-[14px] leading-[1.6] text-ink3">
-        Echo reads the written policy, searches every decision your team has already made, and
-        shows you where the two disagree. It advises — a person decides.
-      </p>
+    <div className="echo-empty" role="note">
+      <div className="echo-empty__block">
+        <span className="flex h-[48px] w-[48px] items-center justify-center rounded-[16px] border border-line bg-sunken">
+          <EchoMark size={24} className="text-ink3" accent="var(--ink4)" />
+        </span>
+        <h1 className="mt-6 text-[20px] font-semibold tracking-[-0.02em] text-ink">
+          Open an exception to begin
+        </h1>
+        <p className="mt-3 text-[14px] leading-[1.6] text-ink3">
+          Echo reads the written policy, searches every decision your team has already made, and
+          shows you where the two disagree. It advises — a person decides.
+        </p>
+      </div>
     </div>
   );
 }
@@ -156,6 +165,21 @@ function phaseLabel(memoryOn: boolean, busy: boolean, answered: boolean) {
 export default function Investigation({ c, log, memoryOn, busy, stage, failed, decisionBar }: Props) {
   const last = useMemo(() => [...log].reverse().find((t) => t.role === "assistant"), [log]);
   const brief = log.find((t) => t.role === "user")?.content;
+
+  /* A follow-up appends to the transcript, and the answer is appended at the end
+     of the ledger. Bring the newest turn into view — but only by moving THIS
+     element's scrollTop. `scrollIntoView` would walk up and scroll ancestors
+     too, which is exactly the browser-level scroll this layout does not have. */
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const lastLen = useRef(log.length);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const grew = log.length > lastLen.current;
+    lastLen.current = log.length;
+    if (!grew) return;
+    el.scrollTop = el.scrollHeight;
+  }, [log.length, busy]);
 
   const parts = useMemo(() => (last ? parseAnswer(last.content) : null), [last]);
 
@@ -282,7 +306,7 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed, d
       </div>
 
       {/* --------------------------------------------------------- the enquiry */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         <div className={`pb-4 ${MEASURE}`}>
           {busy ? (
             <div className="mb-8">

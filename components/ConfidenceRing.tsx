@@ -16,12 +16,14 @@ type Props = {
   className?: string;
 };
 
+// Confidence tiers only pick the ARC COLOUR — nothing else here. The colour is a
+// theme variable, not a hex literal, so the ring reads correctly in both themes.
 const CONFIDENCE_COLORS: Record<string, string> = {
-  "none": "#4a5361",                    // ink4
-  "low (very small sample)": "#df5d5d", // stop
-  "medium (small sample)": "#d8a343",   // warn/brass
-  "higher": "#42d3c1",                  // teal
-  "high": "#43d19e",                    // good
+  "none": "var(--ink-4)",                  // no evidence
+  "low (very small sample)": "var(--stop)", // thin evidence
+  "medium (small sample)": "var(--warn)",  // partial support
+  "higher": "var(--teal)",                  // strong support
+  "high": "var(--good)",                    // strongest support
 };
 
 const SIZE = 104;

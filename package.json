@@ -16,7 +16,9 @@
     "test:data": "npm run build:test && node .test-build/scripts/data-quality-tests.js",
     "seed:expansion": "npm run build:test && node --env-file=.env.local .test-build/scripts/seed-expansion.js",
     "test:grounding": "npm run build:test && node .test-build/scripts/grounding-tests.js",
-    "test:replay": "npm run build:test && node .test-build/scripts/replay-tests.js"
+    "test:replay": "npm run build:test && node .test-build/scripts/replay-tests.js",
+    "test:rail": "npm run build:test && node --env-file=.env.local .test-build/scripts/rail-evidence-tests.js",
+    "probe:rail": "npm run build:test && node --env-file=.env.local .test-build/scripts/ui-rail-probe.js"
   },
   "dependencies": {
     "@vectorize-io/hindsight-client": "^0.10.1",

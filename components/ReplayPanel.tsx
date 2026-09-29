@@ -88,7 +88,7 @@ export default function ReplayPanel({ cases, currentCondition }: Props) {
       {/* Condition Controls */}
       <div className="echo-replay__controls" style={{ marginBottom: 16 }}>
         <div className="echo-replay__control-group" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink3)", alignSelf: "center", marginRight: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-3)", alignSelf: "center", marginRight: 8 }}>
             Current:
           </span>
           <select
@@ -106,7 +106,7 @@ export default function ReplayPanel({ cases, currentCondition }: Props) {
           </select>
         </div>
         <div className="echo-replay__control-group" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink3)", alignSelf: "center", marginRight: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-3)", alignSelf: "center", marginRight: 8 }}>
             Replay:
           </span>
           <select
@@ -153,12 +153,12 @@ export default function ReplayPanel({ cases, currentCondition }: Props) {
                 <span className="echo-provenance echo-provenance--computed">COMPUTED</span>
                 {replay.current.confidence}
               </div>
-              <div className="echo-replay__case-ids" style={{ marginTop: 8, fontSize: 11, color: "var(--ink4)" }}>
+              <div className="echo-replay__case-ids" style={{ marginTop: 8, fontSize: 11, color: "var(--ink-4)" }}>
                 {replay.current.caseIds.join(" · ")}
               </div>
             </>
           ) : (
-            <p style={{ color: "var(--ink3)", fontSize: 13 }}>No precedent under this condition.</p>
+            <p style={{ color: "var(--ink-3)", fontSize: 13 }}>No precedent under this condition.</p>
           )}
         </div>
 
@@ -187,12 +187,12 @@ export default function ReplayPanel({ cases, currentCondition }: Props) {
                 <span className="echo-provenance echo-provenance--computed">COMPUTED</span>
                 {replay.alternative.confidence}
               </div>
-              <div className="echo-replay__case-ids" style={{ marginTop: 8, fontSize: 11, color: "var(--ink4)" }}>
+              <div className="echo-replay__case-ids" style={{ marginTop: 8, fontSize: 11, color: "var(--ink-4)" }}>
                 {replay.alternative.caseIds.join(" · ")}
               </div>
             </>
           ) : (
-            <p style={{ color: "var(--ink3)", fontSize: 13 }}>No comparable historical precedent was found under alternative conditions.</p>
+            <p style={{ color: "var(--ink-3)", fontSize: 13 }}>No comparable historical precedent was found under alternative conditions.</p>
           )}
         </div>
       </div>
@@ -202,7 +202,7 @@ export default function ReplayPanel({ cases, currentCondition }: Props) {
         {replay.explanation}
       </div>
 
-      <p style={{ marginTop: 12, fontSize: 11, color: "var(--ink4)", fontStyle: "italic" }}>
+      <p style={{ marginTop: 12, fontSize: 11, color: "var(--ink-4)", fontStyle: "italic" }}>
         A replay compares recorded outcomes — it does not predict how the current invoice will be decided.
       </p>
     </div>

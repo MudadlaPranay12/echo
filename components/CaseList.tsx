@@ -1,14 +1,18 @@
 "use client";
 // CaseList — zone 1, the operational queue.
 //
-// 288px wide. Every case is one card — the same surface, border, radius and
-// padding as the memory rail's frames — and the cards stack 8px apart so the
-// queue reads as a set of distinct blocks. A card carries four things: the case
-// id, the vendor, the exception, and a status value. The selected card is the
-// brighter one: a teal-tinted surface, a 4px teal accent on the left edge, and
-// text that steps up a brightness level.
+// It fills whatever the grid gives it (280px on a wide desktop, 260px on a
+// laptop) and never sets a width of its own, so the centre column can never be
+// squeezed by the queue. The panel head and the filter are `flex: 0 0 auto`; only
+// the card list scrolls, which is what keeps the selected case and the filter in
+// view at 720px of height.
+//
+// A card carries four things: the case id (small), the vendor (the loudest line),
+// the exception, and a status value right-aligned. The selected card is the
+// brighter one — a teal wash, a 3px teal accent on the left edge, and text that
+// steps up a brightness level.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CaseItem } from "./echoTypes";
 import { Lbl, cx } from "./ui";
 
@@ -38,7 +42,7 @@ function StatusMarker({ settled, live }: { settled: boolean; live: boolean }) {
       <span
         aria-label="Resolved"
         title="Resolved"
-        className="flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full bg-good/15 text-good"
+        className="flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full bg-good-wash text-good"
       >
         <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path
@@ -78,24 +82,25 @@ function CaseRow({
   disabled: boolean;
 }) {
   return (
-    <li>
+    <li id={`echo-queue-${c.key}`}>
       <button
         type="button"
         onClick={onSelect}
         disabled={disabled}
         aria-current={selected ? "true" : undefined}
         className={cx(
-          "echo-queue-row group flex w-full flex-col gap-1 rounded-[12px] border border-line bg-sunken px-4 py-3.5 text-left transition-colors",
+          "echo-queue-row flex w-full flex-col gap-1 rounded-[10px] border px-3 py-3 text-left",
+          "transition-colors",
+          selected ? "border-teal-soft bg-teal-wash" : "border-line bg-sunken hover:border-line2 hover:bg-surface-2",
           "disabled:pointer-events-none disabled:opacity-40",
-          !selected && "hover:border-line2 hover:bg-surface-2",
         )}
       >
         {/* case id + status */}
         <span className="flex items-center gap-2">
           <span
             className={cx(
-              "truncate font-mono text-[12px] tabular-nums",
-              selected ? "font-medium text-teal" : "text-ink",
+              "truncate font-mono text-[11px] tabular-nums",
+              selected ? "text-teal" : "text-ink3",
             )}
           >
             {c.invoiceNo}
@@ -105,22 +110,22 @@ function CaseRow({
           </span>
         </span>
 
-        {/* vendor */}
+        {/* vendor — the loudest line on the card */}
         <span
           className={cx(
-            "truncate text-[14px] leading-[1.3] text-ink",
+            "truncate text-[14px] leading-[1.35] text-ink",
             selected && "font-semibold",
           )}
         >
           {c.vendor}
         </span>
 
-        {/* exception + variance */}
+        {/* exception + variance, variance hard right */}
         <span className="flex items-baseline gap-2">
           <span
             className={cx(
-              "truncate text-[12px] leading-[1.3]",
-              selected ? "text-ink2" : "text-ink3 group-hover:text-ink2",
+              "truncate text-[11px] leading-[1.35]",
+              selected ? "text-ink2" : "text-ink4",
             )}
           >
             {c.exception.replace(/_/g, " ")}
@@ -156,9 +161,18 @@ export default function CaseList({
     );
   }, [items, q]);
 
+  /* The selected case is scrolled into view whenever it changes, so it can
+     never end up off the top of an independently scrolling queue. */
+  useEffect(() => {
+    if (!activeKey) return;
+    document
+      .getElementById(`echo-queue-${activeKey}`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [activeKey]);
+
   return (
-    <aside className="flex min-h-0 w-[288px] shrink-0 flex-col border-r border-line bg-rail">
-      <div className="flex h-[48px] shrink-0 items-center gap-2 border-b border-line px-4">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="echo-panel-head">
         <Lbl className="text-ink2">{title}</Lbl>
         <span className="ml-auto font-mono text-[12px] text-ink4">{filtered.length}</span>
         {onClose && (
@@ -166,26 +180,26 @@ export default function CaseList({
             type="button"
             onClick={onClose}
             aria-label="Close queue"
-            className="-mr-2 flex h-[44px] w-[44px] items-center justify-center text-[13px] leading-none text-ink4 hover:text-ink"
+            className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] text-ink4 hover:bg-sunken hover:text-ink"
           >
             ✕
           </button>
         )}
       </div>
 
-      <div className="shrink-0 border-b border-line p-3">
+      <div className="echo-panel-sub">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Filter queue"
           aria-label="Filter exception queue"
-          className="echo-filter h-[44px] w-full rounded-[12px] border border-line bg-sunken px-3 text-[14px] text-ink outline-none placeholder:text-ink4"
+          className="echo-filter h-9 w-full rounded-[10px] border border-line bg-sunken px-3 text-[13px] text-ink outline-none"
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-10 pt-3">
+      <div className="echo-scroll px-3 pb-4 pt-3">
         {filtered.length === 0 ? (
-          <p className="px-4 py-8 text-[13px] leading-[1.6] text-ink4">
+          <p className="px-1 py-8 text-[13px] leading-[1.6] text-ink4">
             {q.trim() ? `Nothing matches “${q.trim()}”.` : "Queue is empty."}
           </p>
         ) : (
@@ -203,6 +217,6 @@ export default function CaseList({
           </ul>
         )}
       </div>
-    </aside>
+    </div>
   );
 }

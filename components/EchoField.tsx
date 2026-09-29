@@ -77,7 +77,7 @@ export default function EchoField({ ripple = 0, memoryOn = true }: Props) {
             y1="50%"
             x2={`${x2}%`}
             y2={`${y2}%`}
-            stroke="rgba(66, 211, 193, 0.03)"
+            stroke={`rgba(var(--field-hue), 0.05)`}
             strokeWidth="0.5"
           />
         ))}
@@ -88,7 +88,7 @@ export default function EchoField({ ripple = 0, memoryOn = true }: Props) {
             cx={`${cx}%`}
             cy={`${cy}%`}
             r="3"
-            fill="rgba(66, 211, 193, 0.15)"
+            fill={`rgba(var(--field-hue), 0.18)`}
           />
         ))}
         {/* Outer orbital nodes */}
@@ -98,7 +98,7 @@ export default function EchoField({ ripple = 0, memoryOn = true }: Props) {
             cx={`${cx}%`}
             cy={`${cy}%`}
             r="2"
-            fill="rgba(66, 211, 193, 0.1)"
+            fill={`rgba(var(--field-hue), 0.12)`}
           />
         ))}
       </div>
@@ -111,7 +111,7 @@ export default function EchoField({ ripple = 0, memoryOn = true }: Props) {
         <span className="echo-ring" style={{ inset: "9%" }} />
 
         <div className="echo-mark-glyph">
-          <EchoMark size={32} className="text-inherit" accent="#7fe3d3" />
+          <EchoMark size={32} className="text-inherit" accent="var(--teal)" />
         </div>
       </div>
     </div>

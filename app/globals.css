@@ -3,78 +3,205 @@
 /* ===========================================================================
    Echo — the visual system.
 
-   Nothing in this file is allowed to invent a size. There are exactly three
-   radii (8, 12, 16), one hairline border, one spacing rhythm, and seven type
-   sizes. A component that needs something outside those sets is a component
-   with a mistake in it, not a system that needs widening.
+   The shell is a viewport, not a document: `html`/`body` never scroll, the
+   56px header is a flex child that cannot shrink, and the three columns below it
+   are a CSS grid whose centre track is `minmax(0, 1fr)`. Each column is its own
+   scroll container, so nothing can ever push the header off screen.
+
+   Everything here is expressed as tokens. Dark and light are two values for the
+   same variable names — no component ever branches on the theme, and no border
+   or surface is written twice.
    =========================================================================== */
 
-@theme {
+@theme inline {
   /* surfaces */
-  --color-base: #070a0f;
-  --color-surface: #0b0f15;
-  --color-surface-2: #0e131a;
-  --color-sunken: #111720;
-  --color-rail: rgba(11, 15, 21, 0.8);
+  --color-base: var(--base);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-sunken: var(--sunken);
+  --color-rail: var(--rail);
 
-  /* ink — the four steps of text, and no more */
-  --color-ink: #e8edf2;
-  --color-ink2: #8994a4;
-  --color-ink3: #566171;
-  --color-ink4: #4a5361;
+  /* ink — four steps of text, and no more */
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-ink3: var(--ink3);
+  --color-ink4: var(--ink4);
 
   /* structure */
-  --color-line: #1d2630;
-  --color-line2: #2a3441;
+  --color-line: var(--line);
+  --color-line2: var(--line2);
 
   /* signal */
-  --color-teal: #42d3c1;
-  --color-teal-soft: rgba(66, 211, 193, 0.3);
-  --color-teal-wash: rgba(66, 211, 193, 0.08);
-  --color-brass: #d8a343;
-  --color-brass-soft: rgba(216, 163, 67, 0.3);
-  --color-brass-wash: rgba(216, 163, 67, 0.08);
-  --color-iris: #8b93c9;
-  --color-iris-soft: rgba(139, 147, 201, 0.3);
-  --color-iris-wash: rgba(139, 147, 201, 0.08);
-  --color-good: #43d19e;
-  --color-warn: #d8a343;
-  --color-stop: #df5d5d;
+  --color-accent-ink: var(--accent-ink);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-teal-wash: var(--teal-wash);
+  --color-brass: var(--brass);
+  --color-brass-soft: var(--brass-soft);
+  --color-brass-wash: var(--brass-wash);
+  --color-iris: var(--iris);
+  --color-iris-soft: var(--iris-soft);
+  --color-iris-wash: var(--iris-wash);
+  --color-good: var(--good);
+  --color-good-wash: var(--good-wash);
+  --color-warn: var(--warn);
+  --color-stop: var(--stop);
+  --color-stop-wash: var(--stop-wash);
 
   /* type */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --shadow-panel: 0 28px 70px -28px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.5);
+  --shadow-panel: var(--shadow-panel-value);
 }
 
-:root {
-  /* the one hairline, as a value, so nothing can quietly invent a second */
-  --line: #1d2630;
-  --teal: #42d3c1;
-  --brass: #d8a343;
-  --iris: #8b93c9;
-  --stop: #df5d5d;
+/* --------------------------------------------------------------- dark theme */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --base: #05070a;
+  --surface: #0b1016;
+  --surface-2: #0e141b;
+  --sunken: #111821;
+  --rail: #0b1016;
+
+  --ink: #e8edf2;
+  --ink2: #8d99a8;
+  --ink3: #66707e;
+  --ink4: #4a5361;
+
+  --line: #202a34;
+  --line2: #2c3744;
+
+  --teal: #38c7b5;
+  --accent-ink: #04140f;
+  --teal-soft: rgba(56, 199, 181, 0.32);
+  --teal-wash: rgba(56, 199, 181, 0.08);
+  --brass: #c99a45;
+  --brass-soft: rgba(201, 154, 69, 0.32);
+  --brass-wash: rgba(201, 154, 69, 0.08);
+  --iris: #6e8aa6;
+  --iris-soft: rgba(110, 138, 166, 0.32);
+  --iris-wash: rgba(110, 138, 166, 0.08);
+  --good: #35a87f;
+  --good-wash: rgba(53, 168, 127, 0.12);
+  --warn: #c99a45;
+  --stop: #c8483f;
+  --stop-wash: rgba(200, 72, 63, 0.1);
+
+  --shadow-panel-value: 0 28px 70px -28px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.5);
+
+  --field-base: #05070a;
+  --field-edge: #04060a;
+  --field-hue: 56, 199, 181;
+  --field-hue-2: 201, 154, 69;
+  --field-mark-opacity: 0.14;
+  --field-ring-alpha: 0.12;
+
+  /* rgb triplets, for the few places that need alpha on a signal colour */
+  --teal-rgb: 56, 199, 181;
+  --good-rgb: 53, 168, 127;
+  --stop-rgb: 200, 72, 63;
+  --brass-rgb: 201, 154, 69;
 }
+
+/* -------------------------------------------------------------- light theme */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --base: #f4f6f7;
+  --surface: #ffffff;
+  --surface-2: #fafbfb;
+  --sunken: #f9fafa;
+  --rail: #ffffff;
+
+  /* Four ink steps, all of which clear WCAG AA (4.5:1) on the panel surface.
+     A near-white ground leaves far less headroom than a near-black one, so the
+     ink2 → ink3 → ink4 steps are closer together here than in dark mode. That is
+     deliberate: on this ground, a wider spread would have meant shipping real
+     metadata below the contrast floor to buy a step nobody needs. */
+  --ink: #172027;   /* 15.8:1 on --sunken */
+  --ink2: #45525d;  /*  7.7:1 */
+  --ink3: #596671;  /*  5.6:1 */
+  --ink4: #68757f;  /*  4.5:1 — the floor; used for 11px metadata and placeholders */
+
+  --line: #d9e0e4;
+  --line2: #bcc8ce;
+
+  --teal: #087f73;
+  --accent-ink: #ffffff;
+  --teal-soft: rgba(8, 127, 115, 0.26);
+  --teal-wash: rgba(8, 127, 115, 0.07);
+  --brass: #8a5f1a;
+  --brass-soft: rgba(138, 95, 26, 0.28);
+  --brass-wash: rgba(138, 95, 26, 0.08);
+  --iris: #3f6178;
+  --iris-soft: rgba(63, 97, 120, 0.28);
+  --iris-wash: rgba(63, 97, 120, 0.07);
+  --good: #0f7355;
+  --good-wash: rgba(15, 115, 85, 0.1);
+  --warn: #8a5f1a;
+  --stop: #b3322b;
+  --stop-wash: rgba(179, 50, 43, 0.08);
+
+  --shadow-panel-value: 0 20px 48px -28px rgba(23, 32, 39, 0.3), 0 1px 3px rgba(23, 32, 39, 0.06);
+
+  --field-base: #f4f6f7;
+  --field-edge: #eceff1;
+  /* The orbital field is drawn in cool slate here, not teal. Tinting a white
+     ground with the accent hue reads as a washed-out copy of the dark theme;
+     a neutral hairline circle reads as an embossed one instead. */
+  --field-hue: 100, 116, 132;
+  --field-hue-2: 138, 95, 26;
+  --field-mark-opacity: 0.1;
+  --field-ring-alpha: 0.16;
+
+  --teal-rgb: 8, 127, 115;
+  --good-rgb: 15, 115, 85;
+  --stop-rgb: 179, 50, 43;
+  --brass-rgb: 154, 107, 32;
+}
+
+/* ===========================================================================
+   The viewport. Nothing scrolls here. Ever.
+   =========================================================================== */
 
 html {
   height: 100%;
-  color-scheme: dark;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   height: 100%;
-  background-color: var(--color-base);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
+  max-height: 100%;
+  overflow: hidden;
+  background-color: var(--base);
+  color: var(--ink);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(66, 211, 193, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(66, 211, 193, 0.03) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 30% at 10% 90%, rgba(216, 163, 67, 0.02) 0%, transparent 70%);
+    radial-gradient(ellipse 78% 46% at 50% 8%, rgba(var(--field-hue), 0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 52% 36% at 84% 86%, rgba(var(--field-hue-2), 0.035) 0%, transparent 72%),
+    radial-gradient(ellipse 44% 30% at 12% 92%, rgba(var(--field-hue), 0.025) 0%, transparent 72%);
+  transition:
+    background-color 200ms ease-out,
+    color 200ms ease-out;
+}
+
+/* On a white ground the accent-tinted wash above reads as a yellow-green cast
+   rather than as depth, so light mode gets a cooler, flatter slate wash. */
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(ellipse 78% 46% at 50% 8%, rgba(var(--field-hue), 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 52% 36% at 84% 86%, rgba(var(--field-hue-2), 0.03) 0%, transparent 72%),
+    radial-gradient(ellipse 44% 30% at 12% 92%, rgba(var(--field-hue), 0.02) 0%, transparent 72%);
 }
 
 /* one focus treatment, everywhere */
@@ -84,29 +211,165 @@ body {
   border-radius: 8px;
 }
 
-/* quiet scrollbars */
+/* quiet scrollbars — present when needed, never shouting */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #232b3a transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-*::-webkit-scrollbar-thumb {
-  background: #1b2230;
-  border-radius: 999px;
+  width: 7px;
+  height: 7px;
 }
 *::-webkit-scrollbar-track {
   background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+:root,
+[data-theme="dark"] {
+  --scrollbar-thumb: #1c242e;
+  --scrollbar-thumb-hover: #2a3441;
+}
+[data-theme="light"] {
+  --scrollbar-thumb: #d3dce1;
+  --scrollbar-thumb-hover: #b9c5cc;
+}
+
+/* ===========================================================================
+   The shell — 280px | minmax(0, 1fr) | 330px.
+
+   `minmax(0, 1fr)` is the whole trick: the centre track is allowed to shrink
+   below its content, so the evidence trail and the case facts can never force
+   horizontal overflow. `height: 100%` plus `min-height: 0` at every level is
+   what lets each column scroll on its own.
+   =========================================================================== */
+
+.echo-root {
+  height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.echo-header {
+  flex: 0 0 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.echo-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 330px;
+  gap: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+/* a column: never wider or taller than its track, never its own scroll context */
+.echo-col {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* the side panels are surfaces; the centre is the field itself */
+.echo-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow-panel-value);
+}
+
+.echo-panel-head {
+  flex: 0 0 auto;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.echo-panel-sub {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* the one scrolling primitive. No fixed heights anywhere — the available space
+   always comes from the flex/grid parent. */
+.echo-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive. All three columns are preserved down to 1180px, tightened but
+   never squeezed. Below that the memory rail becomes a drawer, and below 900px
+   the queue does too, so the centre is never reduced to an unusable width.
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1439px) {
+  .echo-shell {
+    grid-template-columns: 260px minmax(0, 1fr) 312px;
+    gap: 6px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 1179px) {
+  .echo-shell {
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+  .echo-col-memory {
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .echo-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
+  }
+  .echo-col-queue {
+    display: none;
+  }
+  .echo-col-center {
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
 }
 
 /* ===========================================================================
    The field — the investigation engine visual.
 
-   A sophisticated orbital visualization behind the center workspace:
-   concentric circles, orbital rings, subtle radial lines, translucent forms.
-   Opacity 0.04–0.12. Never interferes with readability.
+   A fixed orbital backdrop behind the whole workspace. Concentric circles and
+   a soft central bloom, all between 2% and 10% opacity. It is never in the way
+   and it never moves between themes.
    =========================================================================== */
 
 .echo-field {
@@ -116,31 +379,26 @@ body {
   overflow: hidden;
   pointer-events: none;
   background-image:
-    /* Base dark */
-    radial-gradient(ellipse at center, var(--color-base) 0%, #05080c 100%),
-    /* Subtle orbital rings */
-    radial-gradient(circle at 50% 50%, transparent 40%, rgba(66, 211, 193, 0.015) 41%, transparent 42%),
-    radial-gradient(circle at 50% 50%, transparent 55%, rgba(66, 211, 193, 0.012) 56%, transparent 57%),
-    radial-gradient(circle at 50% 50%, transparent 70%, rgba(66, 211, 193, 0.008) 71%, transparent 72%),
-    radial-gradient(circle at 50% 50%, transparent 85%, rgba(66, 211, 193, 0.006) 86%, transparent 87%),
-    /* Central glow */
-    radial-gradient(ellipse 60% 40% at 50% 45%, rgba(66, 211, 193, 0.06) 0%, transparent 70%),
-    /* Secondary brass glow */
-    radial-gradient(ellipse 40% 30% at 75% 75%, rgba(216, 163, 67, 0.025) 0%, transparent 70%),
-    /* Tertiary glow */
-    radial-gradient(ellipse 30% 20% at 20% 85%, rgba(67, 209, 158, 0.02) 0%, transparent 70%);
+    radial-gradient(ellipse at center, var(--field-base) 0%, var(--field-edge) 100%),
+    radial-gradient(circle at 50% 50%, transparent 40%, rgba(var(--field-hue), 0.018) 41%, transparent 42%),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(var(--field-hue), 0.014) 56%, transparent 57%),
+    radial-gradient(circle at 50% 50%, transparent 70%, rgba(var(--field-hue), 0.01) 71%, transparent 72%),
+    radial-gradient(circle at 50% 50%, transparent 85%, rgba(var(--field-hue), 0.008) 86%, transparent 87%),
+    radial-gradient(ellipse 58% 40% at 50% 46%, rgba(var(--field-hue), 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 38% 28% at 74% 76%, rgba(var(--field-hue-2), 0.028) 0%, transparent 70%),
+    radial-gradient(ellipse 28% 20% at 20% 86%, rgba(var(--field-hue), 0.022) 0%, transparent 70%);
 }
 
-/* Orbital rings as pseudo-elements on the mark container */
+/* outer orbital rings, centred on the viewport */
 .echo-field::before {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(400px, 60vw, 800px);
-  height: clamp(400px, 60vw, 800px);
+  width: clamp(400px, 56vw, 760px);
+  height: clamp(400px, 56vw, 760px);
   transform: translate(-50%, -50%);
-  border: 1px solid rgba(66, 211, 193, 0.04);
+  border: 1px solid rgba(var(--field-hue), 0.05);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -150,14 +408,15 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(500px, 75vw, 1000px);
-  height: clamp(500px, 75vw, 1000px);
+  width: clamp(500px, 72vw, 1000px);
+  height: clamp(500px, 72vw, 1000px);
   transform: translate(-50%, -50%);
-  border: 1px solid rgba(66, 211, 193, 0.025);
+  border: 1px solid rgba(var(--field-hue), 0.032);
   border-radius: 50%;
   pointer-events: none;
 }
 
+/* the mark: the exact circle the empty state is centred inside */
 .echo-mark {
   position: absolute;
   top: 50%;
@@ -172,7 +431,7 @@ body {
 /* two hairline rings, and no more */
 .echo-ring {
   position: absolute;
-  border: 1px solid rgba(69, 203, 182, 0.1);
+  border: 1px solid rgba(var(--field-hue), var(--field-ring-alpha));
   border-radius: 50%;
 }
 
@@ -181,7 +440,7 @@ body {
   inset: 18%;
   color: var(--teal);
   /* the resting strength: recognisable, never loud */
-  opacity: 0.12;
+  opacity: var(--field-mark-opacity);
 }
 
 .echo-mark-glyph svg {
@@ -193,18 +452,46 @@ body {
 .echo-ripple {
   position: absolute;
   inset: 18%;
-  border: 1px solid rgba(69, 203, 182, 0.34);
+  border: 1px solid rgba(var(--field-hue), 0.36);
   border-radius: 50%;
   opacity: 0;
 }
 
 /* memory off: quieter, not gone */
 .echo-field[data-memory="off"] .echo-mark-glyph {
-  opacity: 0.08;
+  opacity: 0.09;
 }
 
 .echo-field[data-memory="off"] .echo-ring {
-  border-color: rgba(69, 203, 182, 0.06);
+  border-color: rgba(var(--field-hue), 0.07);
+}
+
+/* ===========================================================================
+   The empty state.
+
+   `position: fixed` with a single centred grid cell, so the icon + heading +
+   description land on the exact centre of `.echo-mark` rather than the centre
+   of the centre column. The three parts are one block: nothing between them is
+   allowed to break the centring.
+   =========================================================================== */
+
+.echo-empty {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: none;
+}
+
+.echo-empty__block {
+  display: flex;
+  max-width: 460px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 /* ===========================================================================
@@ -239,16 +526,16 @@ body {
   height: 11px;
   border: 1px solid var(--line2);
   border-radius: 50%;
-  background: var(--color-base);
+  background: var(--base);
 }
 
 .echo-stage[data-state="done"]::before {
-  border-color: rgba(69, 203, 182, 0.5);
+  border-color: rgba(var(--teal-rgb, 56, 199, 181), 0.5);
 }
 
 .echo-stage[data-state="active"]::before {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(69, 203, 182, 0.12);
+  box-shadow: 0 0 0 3px var(--teal-wash);
 }
 
 /* ===========================================================================
@@ -267,7 +554,7 @@ body {
 }
 
 .echo-gap-rule {
-  background: rgba(217, 164, 65, 0.4);
+  background: var(--brass-soft);
 }
 
 .echo-gap-dot {
@@ -320,7 +607,7 @@ body {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--color-sunken);
+  background: var(--sunken);
   padding: 8px 12px;
   text-align: left;
   transition:
@@ -330,19 +617,19 @@ body {
 
 .echo-node:hover,
 .echo-node:focus-visible {
-  border-color: rgba(69, 203, 182, 0.4);
-  background: #121822;
+  border-color: var(--teal-soft);
+  background: var(--surface-2);
 }
 
 .echo-node[data-open="true"] {
-  border-color: rgba(69, 203, 182, 0.55);
+  border-color: var(--teal-soft);
 }
 
 /* the detail lives below the chain, never inside the node */
 .echo-node-detail {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--color-sunken);
+  background: var(--sunken);
   padding: 16px;
 }
 
@@ -357,8 +644,9 @@ body {
 }
 
 .echo-queue-row[aria-current="true"] {
-  background: rgba(69, 203, 182, 0.16);
-  box-shadow: inset 4px 0 0 var(--teal);
+  background: var(--teal-wash);
+  border-color: var(--teal-soft);
+  box-shadow: inset 3px 0 0 var(--teal);
 }
 
 .echo-filter {
@@ -366,7 +654,58 @@ body {
 }
 
 .echo-filter:focus {
-  border-color: rgba(66, 211, 193, 0.4);
+  border-color: var(--teal-soft);
+}
+
+.echo-filter::placeholder,
+.echo-field-input::placeholder {
+  color: var(--ink4);
+}
+
+/* ===========================================================================
+   The memory rail's comparable-decision cards.
+
+   A card is a remembered decision: a document, the case it belongs to, the
+   context it was taken in, the variance, the outcome, and what resolved it.
+   One card, one border, one radius — so a column of them reads as a list and
+   not as a stack of unrelated boxes.
+   =========================================================================== */
+
+.echo-mem-card {
+  padding: 14px;
+  transition:
+    background-color 140ms ease-out,
+    border-color 140ms ease-out;
+}
+
+.echo-mem-card:hover {
+  background: var(--surface-2);
+  border-color: var(--line-2);
+}
+
+/* one of the three evidence sections. Identical geometry for all three, so the
+   rail reads as three peers rather than three different boxes. */
+.echo-mem-section {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--sunken);
+  padding: 14px;
+}
+
+/* an observed pattern: the real pattern name plus the real support tally */
+.echo-mem-pattern {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 10px 12px;
+}
+
+.echo-field-input {
+  transition: border-color 160ms ease-out;
+}
+
+.echo-field-input:focus {
+  border-color: var(--teal-soft);
 }
 
 /* ===========================================================================
@@ -378,18 +717,18 @@ body {
 }
 
 .echo-switch-group:hover {
-  background: var(--color-sunken);
+  background: var(--sunken);
 }
 
 .echo-switch {
   position: relative;
   display: block;
-  width: 36px;
-  height: 20px;
+  width: 32px;
+  height: 18px;
   flex: none;
   border-radius: 999px;
   border: 1px solid var(--line2);
-  background: #131820;
+  background: var(--surface-2);
   transition: background-color 200ms ease-out, border-color 200ms ease-out;
 }
 
@@ -397,21 +736,21 @@ body {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--color-ink4);
+  background: var(--ink4);
   transition: transform 240ms cubic-bezier(0.32, 1.4, 0.5, 1), background-color 200ms ease-out;
 }
 
 .echo-switch-group[data-on="true"] .echo-switch {
-  border-color: rgba(66, 211, 193, 0.4);
-  background: rgba(66, 211, 193, 0.12);
+  border-color: var(--teal-soft);
+  background: var(--teal-wash);
 }
 
 .echo-switch-group[data-on="true"] .echo-switch-knob {
   background: var(--teal);
-  transform: translateX(16px);
+  transform: translateX(14px);
 }
 
 .echo-switch-label {
@@ -441,13 +780,90 @@ body {
 }
 
 /* ===========================================================================
+   The theme selector — three states: System, Light, Dark
+   =========================================================================== */
+
+.echo-theme-toggle svg {
+  transition: transform 240ms ease-out;
+}
+
+.echo-theme-toggle:hover svg {
+  transform: rotate(12deg);
+}
+
+/* the system button's split face: what the OS is asking for, right now */
+.echo-theme-split {
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.echo-theme-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 60;
+  min-width: 152px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-value);
+}
+
+.echo-theme-menu__item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 7px 8px;
+  font-size: 13px;
+  color: var(--ink-3);
+  transition:
+    background-color 120ms ease-out,
+    color 120ms ease-out;
+}
+
+.echo-theme-menu__item:hover {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.echo-theme-menu__item[data-active="true"] {
+  color: var(--teal);
+  font-weight: 500;
+}
+
+.echo-theme-menu__icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  opacity: 0.85;
+}
+
+/* the floating "jump to decision" control — theme-aware depth, no hardcoded black */
+.echo-pill {
+  box-shadow: var(--shadow-pill);
+}
+
+:root,
+[data-theme="dark"] {
+  --shadow-pill: 0 14px 34px -12px rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="light"] {
+  --shadow-pill: 0 12px 28px -14px rgba(23, 32, 39, 0.4);
+}
+
+/* ===========================================================================
    The composer — a gradient that arrives on focus and never resizes anything
    =========================================================================== */
 
 .echo-compose {
   position: relative;
   border: 1px solid var(--line);
-  background: var(--color-sunken);
+  background: var(--sunken);
   transition: border-color 160ms ease-out;
 }
 
@@ -463,7 +879,7 @@ body {
 
 /* a soft pool of light, inside the border */
 .echo-compose::before {
-  background: radial-gradient(120% 160% at 50% 120%, rgba(66, 211, 193, 0.12), transparent 70%);
+  background: radial-gradient(120% 160% at 50% 120%, rgba(var(--field-hue), 0.13), transparent 70%);
   transition: opacity 220ms ease-out;
 }
 
@@ -506,7 +922,8 @@ body {
   transition:
     transform 120ms ease-out,
     background-color 140ms ease-out,
-    border-color 140ms ease-out;
+    border-color 140ms ease-out,
+    color 140ms ease-out;
 }
 
 .echo-btn:hover:not(:disabled) {
@@ -533,10 +950,6 @@ body {
    The memory rail
    =========================================================================== */
 
-.echo-rail-live {
-  box-shadow: inset 2px 0 0 var(--teal);
-}
-
 .echo-rail-sweep {
   position: absolute;
   inset: 0;
@@ -544,25 +957,11 @@ body {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(69, 203, 182, 0) 0%,
-    rgba(69, 203, 182, 0.14) 44%,
-    rgba(69, 203, 182, 0) 100%
+    rgba(var(--teal-rgb), 0) 0%,
+    rgba(var(--teal-rgb), 0.16) 44%,
+    rgba(var(--teal-rgb), 0) 100%
   );
 }
-
-.echo-frame {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--color-sunken);
-  padding: 16px;
-  transition: border-color 160ms ease-out;
-}
-
-.echo-frame:hover {
-  border-color: var(--line2);
-}
-
-
 
 /* ===========================================================================
    Small shared states
@@ -588,12 +987,12 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(66, 211, 193, 0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--teal-rgb, 56, 199, 181), 0.5), transparent);
   animation: echo-sweep 1.4s linear infinite;
 }
 
 .echo-skeleton {
-  background: #121721;
+  background: var(--surface-2);
 }
 
 .echo-spin {
@@ -601,12 +1000,11 @@ body {
 }
 
 .echo-pulse-once {
-  animation: echo-pop 400ms ease-out;
+  animation: echo-pop 320ms ease-out;
 }
 .echo-settle {
   animation: echo-settle 420ms cubic-bezier(0.2, 1.3, 0.4, 1);
 }
-
 
 /* ===========================================================================
    Confidence Ring
@@ -621,10 +1019,10 @@ body {
 
 .echo-confidence-ring__track {
   fill: none;
-  stroke: var(--color-ink4);
+  stroke: var(--ink4);
   stroke-width: 10;
   stroke-linecap: round;
-  opacity: 0.28;
+  opacity: 0.3;
 }
 
 .echo-confidence-ring__arc {
@@ -641,7 +1039,7 @@ body {
   align-items: center;
   justify-content: center;
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
+  font-family: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 18px;
   font-weight: 600;
   color: var(--ink);
@@ -689,7 +1087,7 @@ body {
   margin-top: 2px;
   border-radius: 50%;
   background: var(--teal);
-  box-shadow: 0 0 0 3px var(--color-base), 0 0 0 5px var(--teal);
+  box-shadow: 0 0 0 3px var(--base), 0 0 0 5px var(--teal);
 }
 
 .echo-condition-chain__content {
@@ -738,21 +1136,21 @@ body {
 }
 
 .echo-provenance--computed {
-  background: var(--color-teal-wash);
+  background: var(--teal-wash);
   color: var(--teal);
-  border: 1px solid rgba(66, 211, 193, 0.3);
+  border: 1px solid var(--teal-soft);
 }
 
 .echo-provenance--evidence {
-  background: var(--color-sunken);
+  background: var(--surface-2);
   color: var(--ink2);
   border: 1px solid var(--line);
 }
 
 .echo-provenance--synthesized {
-  background: var(--color-iris-wash);
+  background: var(--iris-wash);
   color: var(--iris);
-  border: 1px solid rgba(139, 147, 201, 0.3);
+  border: 1px solid var(--iris-soft);
 }
 
 /* ===========================================================================
@@ -762,7 +1160,7 @@ body {
 .echo-replay {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--color-sunken);
+  background: var(--sunken);
   padding: 16px;
 }
 
@@ -783,38 +1181,51 @@ body {
 
 .echo-replay__controls {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 16px;
+}
+
+.echo-replay__control-group {
+  display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.echo-replay__control-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
 }
 
 .echo-replay__control {
   display: flex;
+  min-height: 36px;
+  min-width: 180px;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--color-surface);
+  background: var(--surface);
   font-size: 12px;
   font-weight: 500;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   color: var(--ink2);
   cursor: pointer;
   transition: background-color 140ms ease-out, border-color 140ms ease-out, color 140ms ease-out;
 }
 
 .echo-replay__control:hover {
-  background: var(--color-surface-2);
+  background: var(--surface-2);
   border-color: var(--line2);
-}
-
-.echo-replay__control--active {
-  border-color: var(--teal);
-  background: var(--color-teal-wash);
-  color: var(--teal);
 }
 
 .echo-replay__comparison {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -822,12 +1233,12 @@ body {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--color-surface);
+  background: var(--surface);
 }
 
 .echo-replay__side--current {
-  border-color: var(--teal);
-  background: var(--color-teal-wash);
+  border-color: var(--teal-soft);
+  background: var(--teal-wash);
 }
 
 .echo-replay__side-label {
@@ -848,7 +1259,7 @@ body {
 
 .echo-replay__stat-value {
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
+  font-family: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 20px;
   font-weight: 600;
   color: var(--ink);
@@ -860,8 +1271,19 @@ body {
 }
 
 .echo-replay__confidence {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
   font-size: 12px;
   color: var(--ink3);
+}
+
+.echo-replay__case-ids {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink4);
 }
 
 .echo-replay__explanation {
@@ -873,24 +1295,11 @@ body {
   color: var(--ink3);
 }
 
-/* ===========================================================================
-   One-line Memory Story
-   =========================================================================== */
-
-.echo-memory-story {
-  margin-bottom: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--color-sunken);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink2);
-}
-
-.echo-memory-story--off {
-  background: var(--color-sunken);
-  color: var(--ink3);
+.echo-replay__footnote {
+  margin-top: 12px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ink4);
 }
 
 /* ===========================================================================
@@ -902,11 +1311,11 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 28px 16px;
   text-align: center;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--color-sunken);
+  background: var(--sunken);
 }
 
 .echo-memory-off__icon {
@@ -925,7 +1334,7 @@ body {
   font-size: 13px;
   line-height: 1.6;
   color: var(--ink3);
-  max-width: 28ch;
+  max-width: 30ch;
 }
 
 .echo-error {
@@ -933,44 +1342,41 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 28px 16px;
   text-align: center;
-  border: 1px solid var(--line);
+  border: 1px solid var(--stop);
   border-radius: 12px;
-  background: var(--color-sunken);
+  background: var(--stop-wash);
 }
 
 .echo-error__title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--ink);
+  color: var(--stop);
   margin-bottom: 8px;
 }
 
 .echo-error__text {
   font-size: 13px;
   line-height: 1.6;
-  color: var(--ink3);
-  max-width: 28ch;
+  color: var(--ink2);
+  max-width: 32ch;
 }
 
 /* ===========================================================================
-   Top Investigation Summary
+   Investigation summary — one quiet sentence under the identity, not a card
    =========================================================================== */
 
 .echo-investigation-summary {
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--color-surface);
-  font-size: 14px;
+  border-left: 2px solid var(--teal-soft);
+  padding-left: 12px;
+  font-size: 13px;
   line-height: 1.6;
   color: var(--ink2);
 }
 
 /* ===========================================================================
-   Policy-Practice Gap (enhanced)
+   Policy-Practice Gap
    =========================================================================== */
 
 .echo-gap-indicator {
@@ -978,15 +1384,16 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin: 12px auto 0;
   padding: 8px 16px;
   border-radius: 999px;
-  background: var(--color-brass-wash);
+  background: var(--brass-wash);
   color: var(--brass);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  border: 1px solid rgba(216, 163, 67, 0.3);
+  border: 1px solid var(--brass-soft);
 }
 
 .echo-gap-indicator--animate {
@@ -995,11 +1402,9 @@ body {
 
 @keyframes echo-gap-reveal {
   0% {
-    width: 0;
     opacity: 0;
   }
   100% {
-    width: auto;
     opacity: 1;
   }
 }
@@ -1017,7 +1422,7 @@ body {
     box-shadow: inset 2px 0 0 var(--teal);
   }
   50% {
-    box-shadow: inset 2px 0 0 var(--teal), 0 0 24px rgba(66, 211, 193, 0.2);
+    box-shadow: inset 2px 0 0 var(--teal), 0 0 24px rgba(var(--teal-rgb, 56, 199, 181), 0.2);
   }
   100% {
     box-shadow: inset 2px 0 0 var(--teal);
@@ -1034,11 +1439,11 @@ body {
   0%,
   100% {
     transform: scale(1);
-    opacity: 0.11;
+    opacity: 0.13;
   }
   50% {
     transform: scale(1.018);
-    opacity: 0.14;
+    opacity: 0.17;
   }
 }
 
@@ -1116,6 +1521,7 @@ body {
   }
 }
 
+/* rgb triplets are declared alongside each theme above */
 @media (prefers-reduced-motion: no-preference) {
   /* 1. the mark, breathing */
   .echo-mark-glyph {
@@ -1124,7 +1530,7 @@ body {
 
   .echo-field[data-memory="off"] .echo-mark-glyph {
     animation: none;
-    opacity: 0.08;
+    opacity: 0.09;
   }
 
   /* 2. the recall ripple */
@@ -1132,12 +1538,12 @@ body {
     animation: echo-ripple-out 1200ms ease-out 1 forwards;
   }
 
-  /* 4. the composer's travelling edge */
+  /* 3. the composer's travelling edge */
   .echo-compose:focus-within::after {
     animation: echo-angle 7s linear infinite;
   }
 
-  /* 5. the memory sweep */
+  /* 4. the memory sweep */
   .echo-rail-sweep {
     animation: echo-sweep 1200ms ease-out 1 forwards;
   }
@@ -1163,5 +1569,7 @@ body {
     animation: echo-settle 420ms cubic-bezier(0.2, 1.3, 0.4, 1);
   }
 
-
+  .echo-gap-indicator--animate {
+    animation: echo-gap-reveal 800ms ease-out;
+  }
 }

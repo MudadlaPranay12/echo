@@ -27,6 +27,8 @@
     "../lib/grounding.ts",
     "../lib/replay.ts",
     "../lib/echo_seed_data.json",
+    "../components/railEvidence.ts",
+    "../components/echoTypes.ts",
     "./test-corpus.ts",
     "./pattern-memory-tests.ts",
     "./recall-contract-tests.ts",
@@ -39,6 +41,8 @@
     "./seed-expansion.ts",
     "./data-quality-tests.ts",
     "./grounding-tests.ts",
-    "./replay-tests.ts"
+    "./replay-tests.ts",
+    "./ui-rail-probe.ts",
+    "./rail-evidence-tests.ts"
   ]
 }

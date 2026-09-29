@@ -112,36 +112,6 @@ export function Stage({
   );
 }
 
-/* -------------------------------------------------------------------- frame */
-
-/**
- * The memory rail's frame. Three of these, and because they are one component
- * they cannot end up different widths, radii, borders or padding.
- */
-export function Frame({
-  title,
-  meta,
-  children,
-  className,
-}: {
-  title: string;
-  meta?: ReactNode;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section className={cx("echo-frame", className)}>
-      <div className="flex items-center gap-2">
-        <h3 className="text-[12px] font-semibold uppercase leading-none tracking-[0.12em] text-ink3">
-          {title}
-        </h3>
-        {meta && <span className="ml-auto shrink-0 font-mono text-[12px] text-ink4">{meta}</span>}
-      </div>
-      <div className="mt-3">{children}</div>
-    </section>
-  );
-}
-
 /* -------------------------------------------------------------- disclosure */
 
 /** Smooth expand/collapse: instant height, animated opacity. */

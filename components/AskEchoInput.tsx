@@ -100,7 +100,9 @@ export default function AskEchoInput({
 
   return (
     <div className="shrink-0 border-t border-line px-6 py-4">
-      <div className="mx-auto max-w-[800px]">
+      {/* the same measure as the investigation above it, so the composer's left
+          edge lines up with the case identity */}
+      <div className="mx-auto w-full max-w-[860px]">
         <div className="mb-2 flex h-[24px] items-center gap-2">
           {busy ? (
             <span className="flex items-center gap-2">
@@ -156,7 +158,7 @@ export default function AskEchoInput({
             className={cx(
               "echo-send flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[8px]",
               sent && "echo-pulse-once",
-              ready ? "bg-teal text-[#04140f]" : "bg-line2 text-ink4",
+              ready ? "bg-teal text-accent-ink" : "bg-line2 text-ink4",
             )}
           >
             <SendArrow />

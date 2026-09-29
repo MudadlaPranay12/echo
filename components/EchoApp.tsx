@@ -18,6 +18,7 @@ import MemoryRail from "./MemoryRail";
 import DecisionBar from "./DecisionBar";
 import AskEchoInput from "./AskEchoInput";
 import MemoryToggle from "./MemoryToggle";
+import ThemeToggle from "./ThemeToggle";
 import ToastHost from "./Toast";
 import type { ButtonState } from "./ActionButton";
 import { Lbl, cx } from "./ui";
@@ -184,12 +185,12 @@ function TopBar({
   }, [historyCount]);
 
   return (
-    <header className="relative z-20 flex h-[64px] shrink-0 items-center gap-3 border-b border-line bg-surface px-6">
+    <header className="echo-header relative z-20 flex items-center gap-3 border-b border-line bg-surface px-4">
       <button
         type="button"
         onClick={onOpenQueue}
         aria-label="Open exception queue"
-        className="-ml-2 flex h-[44px] w-[44px] items-center justify-center text-ink3 hover:text-ink lg:hidden"
+        className="-ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-ink3 hover:bg-sunken hover:text-ink xl:hidden"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -197,16 +198,23 @@ function TopBar({
       </button>
 
       <div className="flex shrink-0 items-center gap-2">
-        <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[8px] border border-line">
-          <EchoMark size={18} className="text-teal" accent="#45cbb6" />
+        <span className="flex h-7 w-7 items-center justify-center rounded-[8px] border border-line bg-sunken">
+          <EchoMark size={15} className="text-teal" />
         </span>
-        <span className="text-[18px] font-semibold tracking-tight text-ink">Echo</span>
+        <span className="text-[16px] font-semibold tracking-tight text-ink">Echo</span>
+        <span
+          aria-hidden="true"
+          className="mx-1 hidden h-4 w-px bg-line2 lg:block"
+        />
+        <span className="hidden text-[11px] font-medium uppercase tracking-[0.14em] text-ink4 lg:block">
+          AP Exception Intelligence
+        </span>
       </div>
 
       {/* one ink that slides between the two views rather than two indicators
           that blink in and out */}
       <nav
-        className="relative ml-2 hidden h-[44px] items-center lg:flex"
+        className="relative ml-1 hidden items-center lg:flex"
         aria-label="Queue view"
       >
         {TABS.map((t) => {
@@ -223,14 +231,14 @@ function TopBar({
               onClick={() => onTab(t.id)}
               aria-current={active ? "page" : undefined}
               className={cx(
-                "relative flex min-h-[44px] items-center gap-2 rounded-[8px] px-3 text-[14px]",
-                active ? "font-medium text-ink" : "text-ink3 hover:text-ink2",
+                "relative flex h-9 items-center gap-2 rounded-[10px] px-3 text-[13px]",
+                active ? "font-medium text-ink" : "text-ink3 hover:bg-sunken hover:text-ink2",
               )}
             >
               {t.label}
               <span
                 className={cx(
-                  "font-mono text-[12px] text-ink4",
+                  "font-mono text-[11px] text-ink4",
                   bumping && "echo-bump text-teal",
                 )}
               >
@@ -242,7 +250,7 @@ function TopBar({
         {ink.width > 0 && (
           <span
             aria-hidden="true"
-            className="echo-tab-ink absolute bottom-0 left-0 h-[2px] rounded-full bg-teal"
+            className="echo-tab-ink absolute bottom-[-9px] left-0 h-[2px] rounded-full bg-teal"
             style={{ width: ink.width, transform: `translateX(${ink.left}px)` }}
           />
         )}
@@ -258,19 +266,21 @@ function TopBar({
           type="button"
           onClick={onOpenMemory}
           aria-label="Open institutional memory"
-          className="flex min-h-[44px] items-center rounded-[12px] border border-line px-3 text-[14px] font-medium text-ink2 hover:text-ink xl:hidden"
+          className="flex h-9 items-center rounded-[10px] border border-line px-3 text-[13px] font-medium text-ink2 hover:bg-sunken hover:text-ink min-[1180px]:hidden"
         >
           Memory
         </button>
 
         <MemoryToggle on={memoryOn} onToggle={onMemory} />
 
+        <ThemeToggle />
+
         <button
           type="button"
           onClick={onSettings}
           aria-label="Settings"
           aria-expanded={settings}
-          className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px] text-ink3 hover:text-ink"
+          className="flex h-9 w-9 items-center justify-center rounded-[10px] text-ink3 hover:bg-sunken hover:text-ink"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <circle cx="8" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.3" />
@@ -393,6 +403,13 @@ export default function EchoApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: history, memoryOn }),
       });
+      /* A 5xx still carries a JSON body, so `r.json()` alone would resolve and
+         the failure would be presented to the user as a successful answer. The
+         status has to be checked before the body is trusted. */
+      if (!r.ok) {
+        await r.json().catch(() => null);
+        throw new Error(`agent ${r.status}`);
+      }
       const data: { reply: string; trace: Trace[] } = await r.json();
       const trace = data.trace ?? [];
       const ev = buildEvidence(trace);
@@ -472,7 +489,7 @@ export default function EchoApp() {
   const listItems = tab === "history" ? CASES.filter((c) => resolved.includes(c.key)) : CASES;
 
   return (
-    <div className="relative isolate flex h-dvh flex-col overflow-hidden bg-base text-ink">
+    <div className="echo-root relative isolate bg-base text-ink">
       <EchoField ripple={ripple} memoryOn={memoryOn} />
 
       <TopBar
@@ -497,7 +514,7 @@ export default function EchoApp() {
             onClick={() => setSettings(false)}
             className="fixed inset-0 z-20 cursor-default"
           />
-          <div className="absolute right-6 top-16 z-30 mt-2 w-[288px] rounded-[12px] border border-line bg-surface p-4 shadow-panel">
+          <div className="absolute right-4 top-[60px] z-30 w-[288px] rounded-[12px] border border-line bg-surface p-4 shadow-panel">
             <Lbl>System</Lbl>
             <dl className="mt-3 grid grid-cols-[80px_1fr] gap-x-4 gap-y-2 text-[12px] leading-[1.6]">
               <dt className="text-ink4">Memory</dt>
@@ -528,25 +545,28 @@ export default function EchoApp() {
         </>
       )}
 
-      {/* The workspace: one edge-to-edge flex row. The queue (288px) and the
-          memory rail (400px) are fixed; the investigation takes every remaining
-          pixel. Each column is min-h-0 and scrolls inside itself, so the three
-          share one top, one content line and one bottom edge. */}
-      <div className="relative z-10 flex min-h-0 flex-1 flex-row">
+      {/* The workspace: a CSS grid of 280px | minmax(0, 1fr) | 330px. The centre
+          track is allowed to shrink below its content, so the evidence chain can
+          never force horizontal overflow; every column is `min-height: 0` and
+          scrolls inside itself, so the three share one top, one content line and
+          one bottom edge and the header can never move. */}
+      <div className="echo-shell relative z-10">
         {/* ---------------------------------------------- zone 1: the queue */}
-        <div className="hidden min-h-0 w-[288px] shrink-0 lg:flex flex-row">
-          <CaseList
-            title={tab === "history" ? "Resolved" : "Exception Queue"}
-            items={listItems}
-            activeKey={activeCase?.key ?? null}
-            onSelect={openCase}
-            busy={busy}
-            resolved={resolved}
-          />
+        <div className="echo-col echo-col-queue">
+          <div className="echo-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[12px]">
+            <CaseList
+              title={tab === "history" ? "Resolved" : "Exception Queue"}
+              items={listItems}
+              activeKey={activeCase?.key ?? null}
+              onSelect={openCase}
+              busy={busy}
+              resolved={resolved}
+            />
+          </div>
         </div>
 
         {/* ------------------------------------------- zone 2: investigation */}
-        <main className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        <main className="echo-col echo-col-center">
           <Investigation
             c={activeCase}
             log={log}
@@ -611,9 +631,9 @@ export default function EchoApp() {
                   block: "start",
                 })
               }
-              className="absolute bottom-[120px] right-4 z-30 flex h-[52px] w-[52px] items-center justify-center rounded-full border border-teal/30 bg-surface text-teal shadow-[0_16px_40px_-12px_rgba(0,0,0,0.85)] transition-colors hover:border-teal/50 hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-soft"
+              className="echo-pill absolute bottom-4 right-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-teal-soft bg-surface text-teal transition-colors hover:border-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-soft"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
                   d="M4.5 12.6 9.75 17.85 19.5 6.4"
                   stroke="currentColor"
@@ -626,8 +646,9 @@ export default function EchoApp() {
           )}
         </main>
 
-          {/* ------------------------------------ zone 3: institutional memory */}
-          <div className="hidden min-h-0 w-[400px] shrink-0 xl:flex flex-row">
+        {/* ------------------------------------ zone 3: institutional memory */}
+        <div className="echo-col echo-col-memory">
+          <div className="echo-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[12px]">
             <MemoryRail
               memoryOn={memoryOn}
               evidence={activeEv ?? {}}
@@ -637,6 +658,7 @@ export default function EchoApp() {
             />
           </div>
         </div>
+      </div>
 
       {/* --------------------------------------------------------- drawers */}
       {drawer && (
@@ -648,7 +670,7 @@ export default function EchoApp() {
             className="absolute inset-0 bg-black/55"
           />
           {drawer === "queue" ? (
-            <div className="absolute left-0 top-0 h-full">
+            <div className="absolute left-0 top-0 h-full w-[min(88vw,320px)] shadow-panel">
               <CaseList
                 title={tab === "history" ? "Resolved" : "Exception Queue"}
                 items={listItems}
@@ -660,7 +682,7 @@ export default function EchoApp() {
               />
             </div>
           ) : (
-            <div className="absolute right-0 top-0 h-full">
+            <div className="absolute right-0 top-0 h-full w-[min(88vw,360px)] shadow-panel">
               <MemoryRail
                 memoryOn={memoryOn}
                 evidence={activeEv ?? {}}

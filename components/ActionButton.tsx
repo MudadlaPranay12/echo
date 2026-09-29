@@ -93,7 +93,7 @@ export default function ActionButton({
         bare
           ? "text-ink3 hover:text-ink"
           : primary
-            ? "bg-teal text-[#04140f] hover:bg-teal/90"
+            ? "bg-teal text-accent-ink hover:bg-teal/90"
             : variant === "govern"
               ? "border border-brass-soft bg-brass-wash text-brass"
               : "border border-line2 bg-surface-2 text-ink2",

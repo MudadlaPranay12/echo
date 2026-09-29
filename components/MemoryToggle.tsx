@@ -26,7 +26,7 @@ export default function MemoryToggle({
           ? "Institutional memory is active. Switch to written policy only."
           : "Written policy only. Switch on to search institutional memory."
       }
-      className="echo-switch-group flex h-[44px] shrink-0 items-center gap-2.5 rounded-[12px] px-3"
+      className="echo-switch-group flex h-9 shrink-0 items-center gap-2.5 rounded-[10px] px-2.5"
     >
       <span aria-hidden="true" className="echo-switch">
         <span className="echo-switch-knob" />
@@ -34,7 +34,7 @@ export default function MemoryToggle({
 
       <span
         className={cx(
-          "echo-switch-label font-mono text-[13px] font-semibold tracking-[0.14em]",
+          "echo-switch-label font-mono text-[12px] font-semibold tracking-[0.14em]",
           on ? "text-teal" : "text-ink3",
         )}
       >

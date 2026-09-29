@@ -9,10 +9,15 @@
 type Props = {
   size?: number;
   className?: string;
+  /**
+   * Colour of the decision node. Defaults to the live teal token rather than a
+   * hex literal, so the mark follows the active theme. Only the empty state's
+   * muted mark passes an explicit ink value.
+   */
   accent?: string;
 };
 
-export default function EchoMark({ size = 24, className = "", accent = "#4F46E5" }: Props) {
+export default function EchoMark({ size = 24, className = "", accent = "var(--teal)" }: Props) {
   return (
     <svg
       width={size}
