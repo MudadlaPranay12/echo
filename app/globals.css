@@ -351,17 +351,14 @@ body {
    =========================================================================== */
 
 .echo-queue-row {
-  height: 64px;
-  transition: background-color 140ms ease-out;
+  transition:
+    background-color 140ms ease-out,
+    border-color 140ms ease-out;
 }
 
 .echo-queue-row[aria-current="true"] {
-  background: rgba(69, 203, 182, 0.05);
-  box-shadow: inset 2px 0 0 var(--teal);
-}
-
-.echo-queue-marker {
-  transition: transform 260ms ease-out;
+  background: rgba(69, 203, 182, 0.16);
+  box-shadow: inset 4px 0 0 var(--teal);
 }
 
 .echo-filter {
@@ -369,7 +366,7 @@ body {
 }
 
 .echo-filter:focus {
-  border-color: rgba(69, 203, 182, 0.4);
+  border-color: rgba(66, 211, 193, 0.4);
 }
 
 /* ===========================================================================
@@ -408,8 +405,8 @@ body {
 }
 
 .echo-switch-group[data-on="true"] .echo-switch {
-  border-color: rgba(69, 203, 182, 0.4);
-  background: rgba(69, 203, 182, 0.12);
+  border-color: rgba(66, 211, 193, 0.4);
+  background: rgba(66, 211, 193, 0.12);
 }
 
 .echo-switch-group[data-on="true"] .echo-switch-knob {
@@ -466,7 +463,7 @@ body {
 
 /* a soft pool of light, inside the border */
 .echo-compose::before {
-  background: radial-gradient(120% 160% at 50% 120%, rgba(69, 203, 182, 0.12), transparent 70%);
+  background: radial-gradient(120% 160% at 50% 120%, rgba(66, 211, 193, 0.12), transparent 70%);
   transition: opacity 220ms ease-out;
 }
 
@@ -572,7 +569,9 @@ body {
    =========================================================================== */
 
 .echo-disclose {
-  transition: opacity 200ms ease-out;
+  transition:
+    grid-template-rows 200ms ease-out,
+    opacity 200ms ease-out;
 }
 
 .echo-live {
@@ -589,7 +588,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(69, 203, 182, 0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(66, 211, 193, 0.5), transparent);
   animation: echo-sweep 1.4s linear infinite;
 }
 
@@ -615,50 +614,38 @@ body {
 
 .echo-confidence-ring {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    var(--color-ink4) 0%,
-    var(--color-ink4) var(--ring-progress, 0%),
-    var(--ring-color, var(--teal)) var(--ring-progress, 0%),
-    var(--ring-color, var(--teal)) 100%
-  );
+  width: 104px;
+  height: 104px;
+  flex-shrink: 0;
 }
 
-.echo-confidence-ring::before {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  border-radius: 50%;
-  background: var(--color-base);
+.echo-confidence-ring__track {
+  fill: none;
+  stroke: var(--color-ink4);
+  stroke-width: 10;
+  stroke-linecap: round;
+  opacity: 0.28;
+}
+
+.echo-confidence-ring__arc {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 400ms ease-out;
 }
 
 .echo-confidence-ring__label {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--ink);
-}
-
-.echo-confidence-ring__sub {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink3);
+  line-height: 1;
 }
 
 /* ===========================================================================
@@ -892,10 +879,10 @@ body {
 
 .echo-memory-story {
   margin-bottom: 12px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--color-surface);
+  border-radius: 12px;
+  background: var(--color-sunken);
   font-size: 13px;
   line-height: 1.5;
   color: var(--ink2);
@@ -1036,12 +1023,6 @@ body {
     box-shadow: inset 2px 0 0 var(--teal);
   }
 }
-
-   Six movements, and that is the whole list: the mark breathing, the recall
-   ripple, the tab indicator, the composer edge, the memory sweep, and hover
-   lifts. Everything below is inside a no-preference query, so with reduced
-   motion the product is completely still and the mark stays at rest opacity.
-   =========================================================================== */
 
 @property --angle {
   syntax: "<angle>";

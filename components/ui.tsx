@@ -58,7 +58,8 @@ export function Spine({ children, className }: { children: ReactNode; className?
 
 /**
  * One stage of the enquiry. The node on the spine is the only state: unlit
- * before it is reached, teal once it exists.
+ * before it is reached, teal once it exists. The body is collapsible — the
+ * header toggles that stage alone, and a header chevron shows its state.
  */
 export function Stage({
   n,
@@ -67,6 +68,8 @@ export function Stage({
   state = "done",
   children,
   className,
+  style,
+  defaultOpen = true,
 }: {
   n: string;
   label: string;
@@ -75,18 +78,36 @@ export function Stage({
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** Whether the section body is expanded on first render. */
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className={cx("echo-stage", className)} data-state={state}>
-      <div className="flex items-center gap-3">
-        <span className="font-mono text-[12px] font-semibold tabular-nums leading-none text-ink4">
+    <section className={cx("echo-stage", className)} data-state={state} style={style}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="group flex w-full items-center gap-3 text-left"
+      >
+        <span className="font-mono text-[12px] font-semibold tabular-nums leading-none text-ink4 group-hover:text-ink2">
           {n}
         </span>
+        <Chevron open={open} className="shrink-0 text-ink4 group-hover:text-ink2" />
         <Lbl className="shrink-0 text-ink2">{label}</Lbl>
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
         {aside && <span className="shrink-0">{aside}</span>}
+      </button>
+      <div
+        className={cx(
+          "echo-disclose grid",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="mt-3">{children}</div>
+        </div>
       </div>
-      <div className="mt-3">{children}</div>
     </section>
   );
 }

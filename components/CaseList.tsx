@@ -1,13 +1,14 @@
 "use client";
 // CaseList — zone 1, the operational queue.
 //
-// 300px wide, and every row exactly 64px so the column reads as a list rather
-// than as a stack of differently-sized ideas. A row carries four things: the case
-// id, the vendor, the exception, and a status marker. The selected row is the
-// same height as every other row and is marked only by a left accent, a faint
-// teal wash, and slightly brighter text.
+// 288px wide. Every case is one card — the same surface, border, radius and
+// padding as the memory rail's frames — and the cards stack 8px apart so the
+// queue reads as a set of distinct blocks. A card carries four things: the case
+// id, the vendor, the exception, and a status value. The selected card is the
+// brighter one: a teal-tinted surface, a 4px teal accent on the left edge, and
+// text that steps up a brightness level.
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { CaseItem } from "./echoTypes";
 import { Lbl, cx } from "./ui";
 
@@ -69,26 +70,24 @@ function CaseRow({
   settled,
   onSelect,
   disabled,
-  rowRef,
 }: {
   c: CaseItem;
   selected: boolean;
   settled: boolean;
   onSelect: () => void;
   disabled: boolean;
-  rowRef: (el: HTMLLIElement | null) => void;
 }) {
   return (
-    <li ref={rowRef}>
+    <li>
       <button
         type="button"
         onClick={onSelect}
         disabled={disabled}
         aria-current={selected ? "true" : undefined}
         className={cx(
-          "echo-queue-row group flex w-full flex-col justify-center gap-1 border-b border-line px-4 py-3 text-left",
+          "echo-queue-row group flex w-full flex-col gap-1 rounded-[12px] border border-line bg-sunken px-4 py-3.5 text-left transition-colors",
           "disabled:pointer-events-none disabled:opacity-40",
-          !selected && "hover:bg-sunken/60",
+          !selected && "hover:border-line2 hover:bg-surface-2",
         )}
       >
         {/* case id + status */}
@@ -96,7 +95,7 @@ function CaseRow({
           <span
             className={cx(
               "truncate font-mono text-[12px] tabular-nums",
-              selected ? "text-teal" : "text-ink4",
+              selected ? "font-medium text-teal" : "text-ink",
             )}
           >
             {c.invoiceNo}
@@ -109,8 +108,8 @@ function CaseRow({
         {/* vendor */}
         <span
           className={cx(
-            "truncate text-[14px] leading-[1.3]",
-            selected ? "font-medium text-ink" : "text-ink2 group-hover:text-ink",
+            "truncate text-[14px] leading-[1.3] text-ink",
+            selected && "font-semibold",
           )}
         >
           {c.vendor}
@@ -121,7 +120,7 @@ function CaseRow({
           <span
             className={cx(
               "truncate text-[12px] leading-[1.3]",
-              selected ? "text-ink3" : "text-ink4",
+              selected ? "text-ink2" : "text-ink3 group-hover:text-ink2",
             )}
           >
             {c.exception.replace(/_/g, " ")}
@@ -146,9 +145,6 @@ export default function CaseList({
 }: Props) {
   const [q, setQ] = useState("");
 
-  const rows = useRef<Record<string, HTMLLIElement | null>>({});
-  const [marker, setMarker] = useState<{ y: number; h: number } | null>(null);
-
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return items;
@@ -160,14 +156,8 @@ export default function CaseList({
     );
   }, [items, q]);
 
-  /* Measure the active row so one rule can travel between rows. */
-  useLayoutEffect(() => {
-    const el = activeKey ? rows.current[activeKey] : null;
-    setMarker(el ? { y: el.offsetTop, h: el.offsetHeight } : null);
-  }, [activeKey, filtered, busy]);
-
   return (
-    <aside className="flex min-h-0 w-[300px] shrink-0 flex-col border-r border-line bg-rail">
+    <aside className="flex min-h-0 w-[288px] shrink-0 flex-col border-r border-line bg-rail">
       <div className="flex h-[48px] shrink-0 items-center gap-2 border-b border-line px-4">
         <Lbl className="text-ink2">{title}</Lbl>
         <span className="ml-auto font-mono text-[12px] text-ink4">{filtered.length}</span>
@@ -193,21 +183,13 @@ export default function CaseList({
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-10 pt-3">
         {filtered.length === 0 ? (
           <p className="px-4 py-8 text-[13px] leading-[1.6] text-ink4">
             {q.trim() ? `Nothing matches “${q.trim()}”.` : "Queue is empty."}
           </p>
         ) : (
-          <ul className="relative">
-            {/* one rule, travelling to whatever is being investigated */}
-            {marker && (
-              <span
-                aria-hidden="true"
-                className="echo-queue-marker pointer-events-none absolute left-0 top-0 w-[2px] bg-teal"
-                style={{ transform: `translateY(${marker.y}px)`, height: marker.h }}
-              />
-            )}
+          <ul className="space-y-2">
             {filtered.map((c) => (
               <CaseRow
                 key={c.key}
@@ -216,9 +198,6 @@ export default function CaseList({
                 settled={resolved.includes(c.key)}
                 onSelect={() => onSelect(c)}
                 disabled={!!busy}
-                rowRef={(el) => {
-                  rows.current[c.key] = el;
-                }}
               />
             ))}
           </ul>

@@ -12,7 +12,7 @@
 // an 11px eyebrow, a 28px case id, a 16px vendor, 13px metadata. The parser below
 // is unchanged: it only reads sections the model actually wrote.
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import EchoMarkdown, { splitSections } from "./echoMarkdown";
 import CaseFacts from "./CaseFacts";
 import PolicyVsPractice from "./PolicyPractice";
@@ -34,6 +34,8 @@ type Props = {
   stage: number;
   /** The last request to this case failed. The investigation stays open. */
   failed: boolean;
+  /** Human decision bar, rendered in normal flow at the end of the content. */
+  decisionBar?: ReactNode;
 };
 
 const MEASURE = "mx-auto w-full max-w-[800px] px-6";
@@ -74,7 +76,7 @@ function parseAnswer(content: string): Parsed {
 
 function Request({ text }: { text: string }) {
   return (
-    <p className="rounded-[12px] border border-line bg-sunken px-4 py-3 text-[13px] leading-[1.6] text-ink3">
+    <p className="min-w-0 break-words rounded-[12px] border border-line bg-sunken px-4 py-3 text-[13px] leading-[1.6] text-ink3">
       {text}
     </p>
   );
@@ -151,7 +153,7 @@ function phaseLabel(memoryOn: boolean, busy: boolean, answered: boolean) {
 
 /* --------------------------------------------------------------------- view */
 
-export default function Investigation({ c, log, memoryOn, busy, stage, failed }: Props) {
+export default function Investigation({ c, log, memoryOn, busy, stage, failed, decisionBar }: Props) {
   const last = useMemo(() => [...log].reverse().find((t) => t.role === "assistant"), [log]);
   const brief = log.find((t) => t.role === "user")?.content;
 
@@ -281,7 +283,7 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
 
       {/* --------------------------------------------------------- the enquiry */}
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className={`pb-16 ${MEASURE}`}>
+        <div className={`pb-4 ${MEASURE}`}>
           {busy ? (
             <div className="mb-8">
               <InvestigationProgress stage={stage} done={false} memoryOn={memoryOn} />
@@ -343,6 +345,7 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
                         n="03"
                         label="What Echo remembers"
                         state="done"
+                        defaultOpen={false}
                         aside={
                           memoryOn ? (
                             hasHistory ? (
@@ -399,19 +402,21 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
                         {trail.length > 0 && recall ? (
                           <>
                             {/* ---- Confidence Ring & Condition Chain */}
-                            <div className="flex flex-col sm:flex-row gap-4 mb-4">
-                              <div className="flex items-start gap-4">
+                            <div className="mb-4 flex flex-col gap-6 sm:flex-row sm:items-stretch">
+                              <div className="flex min-h-[104px] items-center gap-5">
                                 <ConfidenceRing
                                   confidence={recall.stats.confidence}
                                   cases={recall.stats.similar_cases}
                                   approved={recall.stats.approved}
                                 />
-                                <div className="flex flex-col justify-center">
-                                  <p className="text-[13px] leading-[1.6] text-ink3">
+                                <div className="flex min-w-[140px] flex-col justify-center gap-2">
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                                     <span className="echo-provenance echo-provenance--computed">COMPUTED</span>
-                                    {recall.stats.confidence}
-                                  </p>
-                                  <p className="mt-1 text-[12px] leading-[1.6] text-ink4">
+                                    <span className="text-[13px] leading-[1.6] text-ink3">
+                                      {recall.stats.confidence}
+                                    </span>
+                                  </div>
+                                  <p className="text-[12px] leading-[1.6] text-ink4">
                                     {recall.stats.similar_cases} comparable case{recall.stats.similar_cases === 1 ? "" : "s"}
                                   </p>
                                 </div>
@@ -476,7 +481,7 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
 
                       {/* --------------------------------------------------- replay */}
                       {recall && hasHistory && (
-                        <Stage n="06" label="Echo Replay" state="done">
+                        <Stage n="06" label="Echo Replay" state="done" defaultOpen={false}>
                           <ReplayPanel
                             cases={trail.map((c) => ({
                               id: c.id,
@@ -489,7 +494,7 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
                       )}
 
                       {parts.details.length > 0 && (
-                        <Stage n="07" label="Further analysis" state="done">
+                        <Stage n="07" label="Further analysis" state="done" defaultOpen={false}>
                           <div className="space-y-4">
                             {parts.details.map((s, i) => (
                               <div key={i}>
@@ -502,16 +507,19 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
                           </div>
                         </Stage>
                       )}
+
+                      {/* -------------------------------------------------- trace */}
+                      {last?.tools && last.tools.length > 0 && (
+                        <Stage n="08" label="Agent trace" state="done" defaultOpen={false}>
+                          <p className="break-words font-mono text-[12px] leading-[1.8] text-ink3">
+                            {last.tools.join("  →  ")}
+                          </p>
+                        </Stage>
+                      )}
                     </>
                   )
                 )}
               </Spine>
-
-              {last?.tools && last.tools.length > 0 && !busy && (
-                <p className="mt-8 border-t border-line pt-3 font-mono text-[12px] text-ink4">
-                  {last.tools.join("  →  ")}
-                </p>
-              )}
 
               {followUps.length > 0 && (
                 <div className="mt-8">
@@ -562,6 +570,12 @@ export default function Investigation({ c, log, memoryOn, busy, stage, failed }:
             </>
           )}
         </div>
+
+        {/* the human decision bar — in normal flow, only reachable by scrolling
+            to the actual end of the case content */}
+        {decisionBar && (busy || failed || !!last) && (
+          <div className="mt-4 pb-6">{decisionBar}</div>
+        )}
       </div>
     </div>
   );

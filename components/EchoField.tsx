@@ -1,9 +1,12 @@
 "use client";
 // EchoField — the investigation engine visual.
-//
+// 
 // A sophisticated orbital background: concentric rings, radial lines, orbiting nodes.
 // The central mark breathes. A recall triggers a ripple.
 // Memory off quiets the mark. Reduced motion freezes everything.
+// 
+// All radial coordinates are precomputed to fixed precision to ensure
+// server/client hydration consistency.
 
 import { useEffect, useRef, useState } from "react";
 import EchoMark from "./EchoMark";
@@ -14,6 +17,32 @@ type Props = {
   /** With memory off the mark quiets. */
   memoryOn?: boolean;
 };
+
+// Precomputed radial coordinates (cos/sin at 30° increments, 4 decimal precision)
+const RADIAL_LINES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(deg => {
+  const rad = (deg * Math.PI) / 180;
+  return {
+    deg,
+    x2: Number((50 + Math.cos(rad) * 48).toFixed(4)),
+    y2: Number((50 + Math.sin(rad) * 48).toFixed(4)),
+  };
+});
+const INNER_NODES = [0, 90, 180, 270].map(deg => {
+  const rad = (deg * Math.PI) / 180;
+  return {
+    deg,
+    cx: Number((50 + Math.cos(rad) * 30).toFixed(4)),
+    cy: Number((50 + Math.sin(rad) * 30).toFixed(4)),
+  };
+});
+const OUTER_NODES = [45, 135, 225, 315].map(deg => {
+  const rad = (deg * Math.PI) / 180;
+  return {
+    deg,
+    cx: Number((50 + Math.cos(rad) * 42).toFixed(4)),
+    cy: Number((50 + Math.sin(rad) * 42).toFixed(4)),
+  };
+});
 
 export default function EchoField({ ripple = 0, memoryOn = true }: Props) {
   const markRef = useRef<HTMLDivElement>(null);
@@ -41,33 +70,33 @@ export default function EchoField({ ripple = 0, memoryOn = true }: Props) {
         style={{ opacity: memoryOn ? 1 : 0.3 }}
       >
         {/* Radial lines */}
-        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
+        {RADIAL_LINES.map(({ deg, x2, y2 }) => (
           <line
             key={deg}
             x1="50%"
             y1="50%"
-            x2={`${50 + Math.cos((deg * Math.PI) / 180) * 48}%`}
-            y2={`${50 + Math.sin((deg * Math.PI) / 180) * 48}%`}
+            x2={`${x2}%`}
+            y2={`${y2}%`}
             stroke="rgba(66, 211, 193, 0.03)"
             strokeWidth="0.5"
           />
         ))}
         {/* Inner orbital nodes */}
-        {[0, 90, 180, 270].map((deg) => (
+        {INNER_NODES.map(({ deg, cx, cy }) => (
           <circle
             key={deg}
-            cx={`${50 + Math.cos((deg * Math.PI) / 180) * 30}%`}
-            cy={`${50 + Math.sin((deg * Math.PI) / 180) * 30}%`}
+            cx={`${cx}%`}
+            cy={`${cy}%`}
             r="3"
             fill="rgba(66, 211, 193, 0.15)"
           />
         ))}
         {/* Outer orbital nodes */}
-        {[45, 135, 225, 315].map((deg) => (
+        {OUTER_NODES.map(({ deg, cx, cy }) => (
           <circle
             key={deg}
-            cx={`${50 + Math.cos((deg * Math.PI) / 180) * 42}%`}
-            cy={`${50 + Math.sin((deg * Math.PI) / 180) * 42}%`}
+            cx={`${cx}%`}
+            cy={`${cy}%`}
             r="2"
             fill="rgba(66, 211, 193, 0.1)"
           />

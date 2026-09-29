@@ -313,10 +313,13 @@ export default function EchoApp() {
   const [decision, setDecision] = useState<"approve" | "reject">("approve");
   const [resolved, setResolved] = useState<string[]>([]);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  /** True while the human decision bar is out of view (nothing to decide yet). */
+  const [pillShown, setPillShown] = useState(false);
 
   const seq = useRef(0);
   const caseKey = useRef<string | null>(null);
   const tAction = useRef<number | undefined>(undefined);
+  const decisionBarRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!busy) return;
@@ -339,6 +342,21 @@ export default function EchoApp() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [settings]);
+
+  /* The floating "Decide" pill is only shown while the human decision bar is out
+     of view mid-scroll. With the viewport as root, IntersectionObserver still
+     counts clipping by the scroll container, so the pill hides exactly when the
+     bar itself scrolls into view. */
+  useEffect(() => {
+    const node = decisionBarRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => setPillShown(!(entries[0]?.isIntersecting ?? false)),
+      { threshold: 0.2 },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [log, activeCase?.key]);
 
   const push = useCallback((text: string, tone: ToastItem["tone"] = "info") => {
     const id = ++seq.current;
@@ -510,61 +528,64 @@ export default function EchoApp() {
         </>
       )}
 
-      {/* The workspace: 300 / 1fr / 360, 24px between, never wider than 1440,
-          and centred. The three columns share a top, a content line and a
-          bottom edge because nothing in them decides its own height. */}
-      <div className="relative z-10 flex min-h-0 flex-1 justify-center">
-        <div className="grid w-full max-w-[1440px] grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_360px]">
-          {/* ---------------------------------------------- zone 1: the queue */}
-          <div className="hidden min-h-0 lg:flex">
-            <CaseList
-              title={tab === "history" ? "Resolved" : "Exception Queue"}
-              items={listItems}
-              activeKey={activeCase?.key ?? null}
-              onSelect={openCase}
-              busy={busy}
-              resolved={resolved}
-            />
-          </div>
+      {/* The workspace: one edge-to-edge flex row. The queue (288px) and the
+          memory rail (400px) are fixed; the investigation takes every remaining
+          pixel. Each column is min-h-0 and scrolls inside itself, so the three
+          share one top, one content line and one bottom edge. */}
+      <div className="relative z-10 flex min-h-0 flex-1 flex-row">
+        {/* ---------------------------------------------- zone 1: the queue */}
+        <div className="hidden min-h-0 w-[288px] shrink-0 lg:flex flex-row">
+          <CaseList
+            title={tab === "history" ? "Resolved" : "Exception Queue"}
+            items={listItems}
+            activeKey={activeCase?.key ?? null}
+            onSelect={openCase}
+            busy={busy}
+            resolved={resolved}
+          />
+        </div>
 
-          {/* ------------------------------------------- zone 2: investigation */}
-          <main className="flex min-w-0 flex-col">
-            <Investigation
-              c={activeCase}
-              log={log}
-              memoryOn={memoryOn}
-              busy={busy}
-              stage={stage}
-              failed={failed}
-            />
-
-          {activeCase && (
-            <DecisionBar
-              busy={busy}
-              approve={btn("approve")}
-              escalate={btn("escalate")}
-              reject={btn("reject")}
-              onApprove={() => {
-                setDecision("approve");
-                void send(DECISION_APPROVE, "approve");
-              }}
-              onEscalate={() => void send(ESCALATE_TEXT, "escalate")}
-              onReject={() => {
-                setDecision("reject");
-                void send(DECISION_REJECT, "reject");
-              }}
-              recorded={recorded}
-              onRememberConfirm={() => {
-                const approver = activeEv?.owner?.owners[0]?.name;
-                const text =
-                  decision === "reject" ? rejectText(approver) : RESOLVE_APPROVED;
-                void send(text, "remember");
-              }}
-              promo={memoryOn ? activeEv?.promo : undefined}
-              promote={btn("promote")}
-              onPromote={() => void send(PROMOTE_TEXT, "promote")}
-            />
-          )}
+        {/* ------------------------------------------- zone 2: investigation */}
+        <main className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+          <Investigation
+            c={activeCase}
+            log={log}
+            memoryOn={memoryOn}
+            busy={busy}
+            stage={stage}
+            failed={failed}
+            decisionBar={
+              activeCase ? (
+                <div ref={decisionBarRef}>
+                  <DecisionBar
+                    busy={busy}
+                    approve={btn("approve")}
+                    escalate={btn("escalate")}
+                    reject={btn("reject")}
+                    onApprove={() => {
+                      setDecision("approve");
+                      void send(DECISION_APPROVE, "approve");
+                    }}
+                    onEscalate={() => void send(ESCALATE_TEXT, "escalate")}
+                    onReject={() => {
+                      setDecision("reject");
+                      void send(DECISION_REJECT, "reject");
+                    }}
+                    recorded={recorded}
+                    onRememberConfirm={() => {
+                      const approver = activeEv?.owner?.owners[0]?.name;
+                      const text =
+                        decision === "reject" ? rejectText(approver) : RESOLVE_APPROVED;
+                      void send(text, "remember");
+                    }}
+                    promo={memoryOn ? activeEv?.promo : undefined}
+                    promote={btn("promote")}
+                    onPromote={() => void send(PROMOTE_TEXT, "promote")}
+                  />
+                </div>
+              ) : undefined
+            }
+          />
 
           {/* the composer decides whether it is an invitation or a full
               composer, so it is always mounted and never jumps */}
@@ -574,11 +595,39 @@ export default function EchoApp() {
             onSend={(v) => void send(v ?? input)}
             busy={busy}
             contextLabel={activeCase?.invoiceNo ?? null}
-            />
-          </main>
+          />
+
+          {/* floating shortcut to the decision bar — hidden once the bar itself
+              is in view. It never blocks the ledger: the composer is the only
+              pinned element at the panel's bottom edge. */}
+          {activeCase && !busy && pillShown && (
+            <button
+              type="button"
+              aria-label="Jump to the human decision bar"
+              title="Jump to decision"
+              onClick={() =>
+                decisionBarRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+              className="absolute bottom-[120px] right-4 z-30 flex h-[52px] w-[52px] items-center justify-center rounded-full border border-teal/30 bg-surface text-teal shadow-[0_16px_40px_-12px_rgba(0,0,0,0.85)] transition-colors hover:border-teal/50 hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-soft"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M4.5 12.6 9.75 17.85 19.5 6.4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
+        </main>
 
           {/* ------------------------------------ zone 3: institutional memory */}
-          <div className="hidden min-h-0 xl:flex">
+          <div className="hidden min-h-0 w-[400px] shrink-0 xl:flex flex-row">
             <MemoryRail
               memoryOn={memoryOn}
               evidence={activeEv ?? {}}
@@ -588,7 +637,6 @@ export default function EchoApp() {
             />
           </div>
         </div>
-      </div>
 
       {/* --------------------------------------------------------- drawers */}
       {drawer && (

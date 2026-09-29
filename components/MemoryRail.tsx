@@ -1,7 +1,7 @@
 "use client";
 // MemoryRail — zone 3, institutional memory.
 //
-// 360px, a 48px header, and exactly three frames: MEMORY, OBSERVED PATTERN, CONDITION.
+// 400px, a 48px header, and exactly three frames: MEMORY, OBSERVED PATTERN, CONDITION.
 // They are one component, so they cannot end up different widths, radii,
 // borders, padding or heading sizes. Three equal windows onto the same thing.
 //
@@ -72,7 +72,7 @@ function MemoryFrame({
     <Frame title="MEMORY" meta={<span className="flex items-center gap-1.5"><span aria-hidden="true" className="echo-live h-[5px] w-[5px] rounded-full bg-teal" />active</span>}>
       <div className="flex items-center gap-4 mb-3">
         <ConfidenceRing confidence={cases > 0 ? (cases >= 6 ? "higher" : cases >= 3 ? "medium (small sample)" : "low (very small sample)") : "none"} cases={cases} approved={approved} />
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center min-w-[140px]">
           <p className="text-[13px] leading-[1.6] text-ink3">
             <ProvenanceChip kind="computed" />
             {cases > 0 ? (cases >= 6 ? "HIGHER" : cases >= 3 ? "MEDIUM (SMALL SAMPLE)" : "LOW (VERY SMALL SAMPLE)") : "NONE"}
@@ -102,11 +102,15 @@ function MemoryFrame({
 
 /* ------------------------------------------------------------------- frame 2: OBSERVED PATTERN */
 
-function PatternFrame({ text, approved, total }: { text?: string; approved: number; total: number }) {
-  if (text) {
+function PatternFrame({ patterns, approved, total }: { patterns: string[]; approved: number; total: number }) {
+  if (patterns.length > 0) {
     return (
       <Frame title="OBSERVED PATTERN" meta={<span className="flex items-center gap-2"><ProvenanceChip kind="evidence" /><span className="font-mono text-[12px] tabular-nums text-teal">{approved}/{total} approved</span></span>}>
-        <p className="text-[12px] leading-[1.6] text-ink2">{text}</p>
+        <ul className="space-y-1.5">
+          {patterns.map((pattern, i) => (
+            <li key={i} className="text-[12px] leading-[1.6] text-ink2">{pattern}</li>
+          ))}
+        </ul>
       </Frame>
     );
   }
@@ -178,7 +182,7 @@ const frameContent = (
       ) : (
         <>
           {topCondition && (
-            <div className="mb-3 p-3 rounded-[8px] border border-line bg-sunken">
+            <div className="mb-3 rounded-[12px] border border-line bg-sunken p-4">
               <div className="flex items-center gap-2">
                 <span className="echo-provenance echo-provenance--evidence">EVIDENCE</span>
                 <span className="text-[12px] font-semibold text-ink2">{topCondition.label}</span>
@@ -235,7 +239,7 @@ export default function MemoryRail({
     : "Written policy only. Institutional memory is disabled for this investigation.";
 
   return (
-    <aside className="flex min-h-0 w-[360px] shrink-0 flex-col border-l border-line bg-rail">
+    <aside className="flex min-h-0 w-[400px] max-w-[100vw] shrink-0 flex-col border-l border-line bg-rail">
       {/* one sweep, once, when a human decision has actually been recorded */}
       {pulse > 0 && memoryOn && <span key={pulse} aria-hidden="true" className="echo-rail-sweep echo-decision-pulse" />}
 
@@ -271,7 +275,7 @@ export default function MemoryRail({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-10 pt-3">
         <div className="space-y-3">
           <MemoryFrame
             memoryOn={memoryOn}
@@ -283,7 +287,11 @@ export default function MemoryRail({
           />
 
           <PatternFrame
-            text={memoryOn ? rc?.pattern_insight ?? undefined : undefined}
+            patterns={memoryOn && rc?.patterns && topCondition
+              ? rc.patterns
+                  .filter((p) => p.conditions.includes(topCondition.label))
+                  .map((p) => p.exception_pattern)
+              : []}
             approved={st?.approved ?? 0}
             total={st?.similar_cases ?? 0}
           />

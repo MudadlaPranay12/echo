@@ -6,7 +6,8 @@
 // another, because at this point none of them is: they are the four quantities
 // the whole investigation is about.
 //
-// Financial numbers: 32-36px per spec.
+// Financial numbers: clamp(16px, 1.8vw, 28px); a long value wraps to a second
+// line rather than ever touching the card border.
 
 import type { CaseItem } from "./echoTypes";
 import { cx } from "./ui";
@@ -25,13 +26,14 @@ function Cell({
   tone?: "good" | "warn" | "stop";
 }) {
   return (
-    <div className="flex h-[104px] flex-col justify-center gap-1.5 border-r border-line px-5 last:border-r-0">
-      <div className="text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-ink4">
+    <div className="flex min-h-[104px] min-w-0 flex-col justify-center gap-1.5 rounded-[12px] border border-line bg-sunken px-4 py-4">
+      <div className="truncate text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-ink4">
         {label}
       </div>
       <div
         className={cx(
-          "font-mono text-[34px] font-semibold leading-none tracking-[-0.02em] tabular-nums",
+          "min-w-0 whitespace-normal break-words font-mono font-semibold leading-[1.15] tracking-[-0.02em] tabular-nums",
+          "text-[clamp(16px,1.8vw,28px)]",
           tone === "good" && "text-good",
           tone === "warn" && "text-warn",
           tone === "stop" && "text-stop",
@@ -40,7 +42,9 @@ function Cell({
       >
         {value}
       </div>
-      {meta && <div className="font-mono text-[12px] leading-none text-ink4">{meta}</div>}
+      {meta && (
+        <div className="font-mono text-[12px] leading-[1.4] text-ink4 whitespace-normal">{meta}</div>
+      )}
     </div>
   );
 }
@@ -51,7 +55,7 @@ export default function CaseFacts({ c }: { c: CaseItem }) {
   const far = variance !== null && Math.abs(variance) >= 5;
 
   return (
-    <div className="grid grid-cols-4 border-y border-line">
+    <div className="grid grid-cols-4 gap-4">
       <Cell label="Invoiced" value={inr(c.invoice)} meta="as billed" />
       <Cell
         label="Purchase Order"

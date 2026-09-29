@@ -1,8 +1,9 @@
 "use client";
 // DecisionBar — the human decision area.
 //
-// Echo advises. A person decides. This sits directly under the investigation
-// because that is where a decision is made: with the evidence still in view.
+// Echo advises. A person decides. The bar lives in the investigation's normal
+// document flow, at the true end of the case content (after the last section),
+// so it only comes into view once the user has scrolled all the way down.
 //
 // It is a strip, not a card — a single hairline and 16px of air. Every control is
 // 44px, including "Approve & Remember", because the size of a button should not
@@ -108,11 +109,11 @@ export default function DecisionBar({
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="shrink-0 border-t border-line px-6 py-4">
+    <div className="border-t border-line bg-base px-6 py-2">
       <div className="mx-auto max-w-[800px]">
         {/* draft policy — always framed as human review */}
         {promo && (
-          <div className="mb-3 border-l-2 border-brass-soft pl-4">
+          <div className="mb-2 border-l-2 border-brass-soft pl-3">
             <div className="flex items-center gap-2">
               <Lbl className="text-brass">Draft policy</Lbl>
               <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-brass/80">
@@ -163,10 +164,25 @@ export default function DecisionBar({
           </div>
         ) : (
           <>
-            <div className="flex flex-wrap items-center gap-2">
-              <Lbl>Human decision</Lbl>
-              {busy && <span className="text-[12px] text-ink4">waiting for Echo…</span>}
-              <div className="ml-auto flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+              <Lbl className="shrink-0">Human decision</Lbl>
+              {busy && <span className="shrink-0 text-[12px] text-ink4">waiting for Echo…</span>}
+              <div className="flex items-center gap-2">
+                <span className="shrink-0 text-[12px] text-ink4">Already settled this one?</span>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(true)}
+                  disabled={busy}
+                  className={cx(
+                    "flex min-h-[32px] items-center px-1 text-[12px] font-medium text-teal",
+                    "hover:underline hover:decoration-teal-soft hover:underline-offset-2",
+                    busy && "pointer-events-none text-ink4",
+                  )}
+                >
+                  Resolve & Remember
+                </button>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
                 <ActionButton
                   variant="primary"
                   state={approve}
@@ -198,22 +214,6 @@ export default function DecisionBar({
                   Reject
                 </ActionButton>
               </div>
-            </div>
-
-<div className="mt-2 flex items-center gap-2">
-              <span className="text-[12px] text-ink4">Already settled this one?</span>
-              <button
-                type="button"
-                onClick={() => setModalOpen(true)}
-                disabled={busy}
-                className={cx(
-                  "flex min-h-[44px] items-center px-1 text-[13px] font-medium text-teal",
-                  "hover:underline hover:decoration-teal-soft hover:underline-offset-2",
-                  busy && "pointer-events-none text-ink4",
-                )}
-              >
-                Resolve & Remember
-              </button>
             </div>
           </>
         )}
